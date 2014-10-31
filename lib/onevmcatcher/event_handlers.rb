@@ -1,3 +1,6 @@
+# Wrapper for all available vmcatcher event handlers.
+module Onevmcatcher::EventHandlers; end
+
 # Load base handler first
 require File.join(File.dirname(__FILE__), 'event_handlers', "base_event_handler")
 

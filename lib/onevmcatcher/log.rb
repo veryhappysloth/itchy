@@ -1,4 +1,6 @@
 module Onevmcatcher
+  # Handles static logging from the entire application
+  # without the need for a traveling logger instance.
   class Log
 
     include ::Logger::Severity
@@ -7,7 +9,8 @@ module Onevmcatcher
 
     SUBSCRIPTION_HANDLE = "onevmcatcher.log"
 
-    # Creates a new onevmcatcher logger
+    # Creates a new onevmcatcher logger instance. Subsequent logging can be
+    # then performed via static Onevmcatcher::Log methods.
     #
     # @param log_dev [IO,String] The log device.  This is a filename (String) or IO object (typically +STDOUT+,
     # @param log_prefix [String] String placed in front of every logged message
@@ -27,15 +30,20 @@ module Onevmcatcher
       end
     end
 
+    # Closes active logger subscription.
     def close
       ActiveSupport::Notifications.unsubscribe(@log_subscriber)
     end
 
+    # Sets current logging level.
+    #
     # @param severity [::Logger::Severity] severity
     def level=(severity)
       @logger.level = severity
     end
 
+    # Gets current logging level.
+    #
     # @return [::Logger::Severity]
     def level
       @logger.level
@@ -46,7 +54,8 @@ module Onevmcatcher
       ActiveSupport::Notifications.instrument(self::SUBSCRIPTION_HANDLE, :level => ::Logger::DEBUG, :message => message)
     end
 
-    # Log an +INFO+ message
+    # Log an +INFO+ message.
+    #
     # @param message [String] message the message to log; does not need to be a String
     def self.info(message)
       ActiveSupport::Notifications.instrument(self::SUBSCRIPTION_HANDLE, :level => ::Logger::INFO, :message => message)

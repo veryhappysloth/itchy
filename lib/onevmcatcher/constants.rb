@@ -1,6 +1,7 @@
 # Contains all static data and defaults.
 module Onevmcatcher::Constants
 
+  # Known event attributes used by vmcatcher
   EVENT_ENV = [
     'VMCATCHER_EVENT_TYPE',
     'VMCATCHER_EVENT_DC_DESCRIPTION',
@@ -23,6 +24,7 @@ module Onevmcatcher::Constants
     'VMCATCHER_EVENT_VO'
   ].freeze
 
+  # Known vmcatcher configuration attributes
   CONF_ENV = [
     'VMCATCHER_RDBMS',
     'VMCATCHER_CACHE_EVENT',
