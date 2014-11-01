@@ -1,4 +1,13 @@
 module Onevmcatcher
+  # Wraps access to configuration files. Files are loaded
+  # in the following order:
+  #
+  # 1.) ~/.onevmcatcher.yml
+  # 2.) /etc/onevmcatcher/onevmcatcher.yml
+  # 3.) GEM_INSTALL_DIR/config/onevmcatcher.yml
+  #
+  # The first available file will be used. Settings are never
+  # merged from multiple files.
   class Settings < Settingslogic
     HOME_CONF   = File.join(
       ENV['HOME'],
