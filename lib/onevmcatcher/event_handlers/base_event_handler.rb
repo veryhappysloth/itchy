@@ -5,11 +5,13 @@ module Onevmcatcher::EventHandlers
 
     attr_reader :vmc_configuration
     attr_reader :event_env
+    attr_reader :settings
 
-    def initialize(env)
+    def initialize(env, settings = Onevmcatcher::Settings)
       validate_env(env)
       @vmc_configuration = select_vmc_configuration(env)
       @event_env = select_event_env(env)
+      @settings = settings
     end
 
     def handle!
