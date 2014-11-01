@@ -10,5 +10,6 @@ module Onevmcatcher; end
 
 require 'onevmcatcher/version'
 require 'onevmcatcher/constants'
+require 'onevmcatcher/settings'
 require 'onevmcatcher/log'
 require 'onevmcatcher/event_handlers'
