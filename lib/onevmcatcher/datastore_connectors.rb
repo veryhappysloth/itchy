@@ -5,4 +5,4 @@ module Onevmcatcher::DatastoreConnectors; end
 require File.join(File.dirname(__FILE__), 'datastore_connectors', "base_datastore_connector")
 
 # Load all available datastore connectors
-Dir.glob(File.join(File.dirname(__FILE__), 'datastore_connectors', "*.rb")) { |event_file| require event_file.chomp('.rb') }
+Dir.glob(File.join(File.dirname(__FILE__), 'datastore_connectors', "*.rb")) { |connector_file| require connector_file.chomp('.rb') }
