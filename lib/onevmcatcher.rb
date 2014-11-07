@@ -4,6 +4,10 @@ require 'multi_json'
 require 'opennebula'
 require 'mixlib/shellout'
 require 'logger'
+require 'optparse'
+require 'uri'
+require 'erb'
+require 'hashie/mash'
 
 # Wraps all internals of the handler.
 module Onevmcatcher; end
@@ -15,6 +19,7 @@ require 'onevmcatcher/errors'
 require 'onevmcatcher/helpers'
 require 'onevmcatcher/event_handlers'
 require 'onevmcatcher/datastore_connectors'
+require 'onevmcatcher/opts'
 require 'onevmcatcher/metadata_archiver'
 require 'onevmcatcher/image_syncmaster'
 require 'onevmcatcher/image_transformer'

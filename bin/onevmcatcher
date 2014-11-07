@@ -21,11 +21,18 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'rubygems'
 require 'onevmcatcher'
 
-TMP_DIR = "/tmp/vmcatcher"
+# get arguments and validate/parse them to an ostruct
+options = Onevmcatcher::Opts.parse ARGV
+
+# initialize logger
+logger = Onevmcatcher::Log.new(options.log[:out])
+logger.level = options.log[:level]
+
+TMP_DIR = File.join("#{File::SEPARATOR}tmp", 'vmcatcher')
 FileUtils.mkdir_p TMP_DIR
 
 temp_file = Tempfile.new('vmcatcher_env_log')
-permanent_file_path = "#{TMP_DIR}/env_log_#{Time.now.to_s.gsub(/\s+/, '_')}.log"
+permanent_file_path = File.join(TMP_DIR, "#{ENV['VMCATCHER_EVENT_TYPE'] || 'Unknown'}_#{Time.now.to_s.gsub(/\s+/, '_')}.log")
 
 env_log = []
 ENV.each_pair do |key, value|
