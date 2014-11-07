@@ -14,6 +14,29 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
-require 'rubygems'
+# add local dirs to load path if necessary
+lib = File.expand_path(File.join('..', '..', 'lib'), __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+require 'rubygems'
 require 'onevmcatcher'
+
+TMP_DIR = "/tmp/vmcatcher"
+FileUtils.mkdir_p TMP_DIR
+
+temp_file = Tempfile.new('vmcatcher_env_log')
+permanent_file_path = "#{TMP_DIR}/env_log_#{Time.now.to_s.gsub(/\s+/, '_')}.log"
+
+env_log = []
+ENV.each_pair do |key, value|
+  next unless key.include? 'VMCATCHER'
+  env_log << "#{key} = \"#{value}\""
+end
+
+temp_file.write env_log.join("\n")
+temp_file.flush
+
+FileUtils.cp temp_file.path, permanent_file_path
+temp_file.close
+
+exit 0
