@@ -25,6 +25,16 @@ module Onevmcatcher
           options.endpoint = URI(endpoint).to_s
         end
 
+        opts.on("-m",
+                "--metadata-dir PATH",
+                String,
+                "Path to metadata directory, defaults to #{options.metadata_dir.inspect}") do |metadata_dir|
+          raise ArgumentError, "Path specified in --metadata-dir is not a directory!" unless File.directory? metadata_dir
+          raise ArgumentError, "Path specified in --metadata-dir is not writable!" unless File.writable? metadata_dir
+
+          options.metadata_dir = metadata_dir
+        end
+
         opts.on("-o",
                 "--datastore TYPE",
                 String,
@@ -148,6 +158,7 @@ module Onevmcatcher
       options.log.level = Onevmcatcher::Log::ERROR
 
       options.endpoint = "http://localhost:2633/RPC2"
+      options.metadata_dir = "/var/spool/onevmcatcher"
       options.datastore = "opennebula"
       options.timeout = nil
 
