@@ -19,31 +19,65 @@ lib = File.expand_path(File.join('..', '..', 'lib'), __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'rubygems'
+require 'thor'
 require 'onevmcatcher'
 
-# get arguments and validate/parse them to an ostruct
-options = Onevmcatcher::Opts.parse ARGV
+class OnevmcatcherRunnable < Thor
+  include Thor::Actions
 
-# initialize logger
-logger = Onevmcatcher::Log.new(options.log[:out])
-logger.level = options.log[:level]
+  def self.source_root
+    File.expand_path(File.join('..', '..', 'templates'), __FILE__)
+  end
 
-TMP_DIR = File.join("#{File::SEPARATOR}tmp", 'vmcatcher')
-FileUtils.mkdir_p TMP_DIR
+  desc 'event', 'Handle an incoming vmcatcher event'
+  method_option :metadata_dir, :type => :string, :default => '/var/spool/onevmcatcher',
+                :aliases => '-m', :desc => 'Path to a metadata directory for storing events, must be writable'
+  method_option :log_to, :enum => ['stdout', 'stderr'], :default => 'stderr',
+                :aliases => '-l', :desc => 'Device for logging output'
+  method_option :log_level, :enum => ['debug', 'info', 'warn', 'error', 'fatal', 'unknown'],
+                :default => 'error', :aliases => '-b', :desc => 'Logging level'
+  method_option :debug, :type => :boolean, :default => false, :aliases => '-d', :desc => 'Enable debugging'
+  def event
+    # prep
+    opts = normalize_options
+    logger = init_logger(opts)
 
-temp_file = Tempfile.new('vmcatcher_env_log')
-permanent_file_path = File.join(TMP_DIR, "#{ENV['VMCATCHER_EVENT_TYPE'] || 'Unknown'}_#{Time.now.to_s.gsub(/\s+/, '_')}.log")
+    raise ArgumentError, "Metadata directory is not a directory!" unless File.directory? opts.metadata_dir
+    raise ArgumentError, "Metadata directory is not writable!" unless File.writable? opts.metadata_dir
+    FileUtils.mkdir_p opts.metadata_dir
 
-env_log = []
-ENV.each_pair do |key, value|
-  next unless key.include? 'VMCATCHER'
-  env_log << "#{key} = \"#{value}\""
+    temp_file = Tempfile.new('vmcatcher_env_log')
+    permanent_file_path = File.join(
+      opts.metadata_dir,
+      "#{ENV['VMCATCHER_EVENT_TYPE'] || 'Unknown'}_#{Time.now.to_s.gsub(/\s+/, '_')}.json"
+    )
+
+    env_log = ENV.select { |key, _| key.include? 'VMCATCHER' }
+
+    temp_file.write JSON.pretty_generate(env_log)
+    temp_file.flush
+
+    FileUtils.cp temp_file.path, permanent_file_path
+    temp_file.close
+
+    true
+  end
+
+  private
+
+  def normalize_options
+    opts = ::Hashie::Mash.new(options)
+    opts.log_to = (options[:log_to] == 'stdout') ? STDOUT : STDERR
+    opts.log_level = Onevmcatcher::Log.const_get(options[:log_level].upcase)
+    opts
+  end
+
+  def init_logger(options)
+    logger = Onevmcatcher::Log.new(options.log_to)
+    logger.level = options.log_level
+    logger
+  end
+
 end
 
-temp_file.write env_log.join("\n")
-temp_file.flush
-
-FileUtils.cp temp_file.path, permanent_file_path
-temp_file.close
-
-exit 0
+OnevmcatcherRunnable.start
