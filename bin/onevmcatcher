@@ -52,13 +52,16 @@ class OnevmcatcherRunnable < Thor
                 :default => 'error', :aliases => '-b', :desc => 'Logging level'
   method_option :debug, :type => :boolean, :default => false, :aliases => '-d', :desc => 'Enable debugging'
   def archive
-    # prep
     opts = normalize_options
     logger = init_logger(opts)
 
+    Onevmcatcher::Log.info 'Archiver started'
+    Onevmcatcher::Log.debug "With ENV: #{ENV.inspect}"
+    Onevmcatcher::Log.debug "With options: #{opts.inspect}"
+
     Onevmcatcher::MetadataArchiver.new(
-      vmcatcher_event,
-      vmcatcher_config,
+      Onevmcatcher::VmcatcherEvent.new(ENV),
+      Onevmcatcher::VmcatcherConfiguration.new(ENV),
       opts
     ).archive!
   end
@@ -92,7 +95,14 @@ class OnevmcatcherRunnable < Thor
   method_option :skip_ca_check, :type => :boolean, :default => false,
                 :aliases => '-s', :desc => 'Skip server certificate verification'
   def sync
-    # TODO: do something
+    opts = normalize_options
+    logger = init_logger(opts)
+
+    Onevmcatcher::Log.info 'Syncmaster started'
+    Onevmcatcher::Log.debug "With ENV: #{ENV.inspect}"
+    Onevmcatcher::Log.debug "With options: #{opts.inspect}"
+
+    Onevmcatcher::ImageSyncmaster.new(opts).sync!
   end
 
   private
@@ -104,8 +114,12 @@ class OnevmcatcherRunnable < Thor
     opts.log_to = (options[:log_to] == 'stdout') ? STDOUT : STDERR
     opts.log_level = Onevmcatcher::Log.const_get(options[:log_level].upcase)
     opts.log_level = Onevmcatcher::Log::DEBUG if options[:debug]
-    opts.endpoint = URI(options[:endpoint]).to_s
-    opts.datastore = datastore(options[:datastore])
+
+    opts.endpoint = URI(options[:endpoint]).to_s if options[:endpoint]
+
+    if options[:datastore]
+      opts.datastore = Onevmcatcher::Helpers::DatastoreConnectorsHelper.datastore_connector(options[:datastore])
+    end
 
     if options[:skip_ca_check]
       silence_warnings { ::OpenSSL::SSL.const_set(:VERIFY_PEER, ::OpenSSL::SSL::VERIFY_NONE) }
@@ -119,20 +133,6 @@ class OnevmcatcherRunnable < Thor
     logger = Onevmcatcher::Log.new(opts.log_to)
     logger.level = opts.log_level
     logger
-  end
-
-  #
-  def vmcatcher_config
-    Onevmcatcher::VmcatcherConfiguration.new(ENV)
-  end
-
-  #
-  def vmcatcher_event
-    Onevmcatcher::VmcatcherEvent.new(ENV)
-  end
-
-  def datastore(datastore_name)
-    Onevmcatcher::DatastoreConnectors.const_get("#{datastore_name.capitalize}DatastoreConnector")
   end
 
 end

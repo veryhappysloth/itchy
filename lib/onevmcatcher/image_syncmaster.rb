@@ -3,5 +3,15 @@ module Onevmcatcher
   # stored by Onevmcatcher::MetadataArchiver are processed
   # here. This is the place where actual image handling
   # happens.
-  class ImageSyncmaster; end
+  class ImageSyncmaster
+
+    def initialize(options)
+      @options = options || ::Hashie::Mash.new
+    end
+
+    def sync!
+      # TODO: do something
+    end
+
+  end
 end

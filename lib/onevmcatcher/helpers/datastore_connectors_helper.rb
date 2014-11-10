@@ -17,5 +17,14 @@ module Onevmcatcher::Helpers
       available_connectors
     end
 
+    # Converts a datastore name into the corresponding datastore
+    # connector class.
+    #
+    # @param datastore_name [String] name of the datastore
+    # @return [Class] class of the datastore connector
+    def self.datastore_connector(datastore_name)
+      Onevmcatcher::DatastoreConnectors.const_get("#{datastore_name.capitalize}DatastoreConnector")
+    end
+
   end
 end
