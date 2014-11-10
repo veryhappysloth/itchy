@@ -14,5 +14,13 @@ module Onevmcatcher
       )
     end
 
+    def to_pretty_json
+      ::JSON.pretty_generate @attributes
+    end
+
+    def to_json
+      ::JSON.generate @attributes
+    end
+
   end
 end
