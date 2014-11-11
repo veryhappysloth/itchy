@@ -5,12 +5,15 @@ module Onevmcatcher
   # happens.
   class ImageSyncmaster
 
+    attr_reader :options
+
     # Creates a Syncmaster instance handling stored
     # vmcatcher events.
     #
     # @param options [Hashie::Mash] options
     def initialize(options)
       @options = options || ::Hashie::Mash.new
+      init_metadata_dir!
     end
 
     # Triggers event synchronization on the metadata
@@ -18,6 +21,16 @@ module Onevmcatcher
     # the constructor.
     def sync!
       # TODO: do something
+    end
+
+    private
+
+    # Runs basic check on the metadata directory.
+    def init_metadata_dir!
+      fail ArgumentError, 'Metadata directory is ' \
+                          'not a directory!' unless File.directory? options.metadata_dir
+      fail ArgumentError, 'Metadata directory is ' \
+                          'not writable!' unless File.readable? options.metadata_dir
     end
 
   end

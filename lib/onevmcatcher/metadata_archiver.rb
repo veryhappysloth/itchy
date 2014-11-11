@@ -4,10 +4,14 @@ module Onevmcatcher
   # handling happening here.
   class MetadataArchiver
 
-    attr_accessor :vmc_event, :vmc_configuration, :options
+    attr_reader :vmc_event, :vmc_configuration, :options
 
+    # Creates an archiver instance for storing vmcatcher
+    # events to the file system for delayed processing.
     #
-    #
+    # @param vmc_event [Onevmcatcher::VmcatcherEvent] event to store
+    # @param vmc_configuration [Onevmcatcher::VmcatcherConfiguration] vmcatcher configuration
+    # @param options [Hashie::Mash] hash-like structure with options
     def initialize(vmc_event, vmc_configuration, options)
       fail ArgumentError, '"vmc_event" must be an instance ' \
            'of Onevmcatcher::VmcatcherEvent' unless vmc_event.kind_of? Onevmcatcher::VmcatcherEvent
@@ -21,8 +25,9 @@ module Onevmcatcher
       init_metadata_dir!
     end
 
-    #
-    #
+    # Triggers archiving of the provided event. Event is written
+    # to the file system as a JSON-formatted document for delayed
+    # processing.
     def archive!
       temp_file = ::Tempfile.new('vmcatcher_event_metadata_archive')
       permanent_file_path = ::File.join(
@@ -39,14 +44,12 @@ module Onevmcatcher
 
     private
 
-    #
-    #
+    # Runs basic check on the metadata directory.
     def init_metadata_dir!
       fail ArgumentError, 'Metadata directory is ' \
                           'not a directory!' unless File.directory? options.metadata_dir
       fail ArgumentError, 'Metadata directory is ' \
                           'not writable!' unless File.writable? options.metadata_dir
-      ::FileUtils.mkdir_p options.metadata_dir
     end
 
   end
