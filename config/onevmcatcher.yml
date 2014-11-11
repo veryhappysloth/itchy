@@ -1,2 +1,15 @@
 ---
-test: true
+datastore: opennebula
+endpoint: http://localhost:2633/RPC2
+metadata_dir: /var/spool/onevmcatcher
+auth: none
+username:
+password:
+log_to: stderr
+log_level: error
+ca_path: /etc/grid-security/certificates
+ca_file:
+timeout: 1800
+connection_timeout: 15
+debug: false
+skip_ca_check: false

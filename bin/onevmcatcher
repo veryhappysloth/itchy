@@ -27,12 +27,6 @@ require 'openssl'
 class OnevmcatcherRunnable < Thor
   include Thor::Actions
 
-  DEFAULT_METADATA_DIR   = '/var/spool/onevmcatcher'
-  DEFAULT_CA_PATH        = '/etc/grid-security/certificates'
-  DEFAULT_CA_FILE        = nil
-  DEFAULT_TIMEOUT        = 1800
-  DEFAULT_CONN_TIMEOUT   = 15
-
   AVAILABLE_DATASTORES   = Onevmcatcher::Helpers::DatastoreConnectorsHelper.datastores.freeze
   AVAILABLE_LOG_DEVS     = ['stdout', 'stderr'].freeze
   AVAILABLE_LOG_LEVELS   = ['debug', 'info', 'warn', 'error', 'fatal', 'unknown'].freeze
@@ -44,13 +38,14 @@ class OnevmcatcherRunnable < Thor
   end
 
   desc 'archive', 'Handle an incoming vmcatcher event and store it for further processing'
-  method_option :metadata_dir, :type => :string, :default => DEFAULT_METADATA_DIR,
+  method_option :metadata_dir, :type => :string, :default => Onevmcatcher::Settings.metadata_dir,
                 :aliases => '-m', :desc => 'Path to a metadata directory for storing events, must be writable'
-  method_option :log_to, :enum => AVAILABLE_LOG_DEVS, :default => 'stderr',
+  method_option :log_to, :enum => AVAILABLE_LOG_DEVS, :default => Onevmcatcher::Settings.log_to,
                 :aliases => '-l', :desc => 'Device for logging output'
-  method_option :log_level, :enum => AVAILABLE_LOG_LEVELS,
-                :default => 'error', :aliases => '-b', :desc => 'Logging level'
-  method_option :debug, :type => :boolean, :default => false, :aliases => '-d', :desc => 'Enable debugging'
+  method_option :log_level, :enum => AVAILABLE_LOG_LEVELS, :default => Onevmcatcher::Settings.log_level,
+                :aliases => '-b', :desc => 'Logging level'
+  method_option :debug, :type => :boolean, :default => Onevmcatcher::Settings.debug,
+                :aliases => '-d', :desc => 'Enable debugging'
   def archive
     opts = normalize_options
     logger = init_logger(opts)
@@ -67,32 +62,33 @@ class OnevmcatcherRunnable < Thor
   end
 
   desc 'sync', 'Sync archived vmcatcher events and upload images into the datastore'
-  method_option :datastore, :enum => AVAILABLE_DATASTORES, :required => true,
+  method_option :datastore, :enum => AVAILABLE_DATASTORES, :default => Onevmcatcher::Settings.datastore,
                 :aliases => '-o', :desc => 'Path to a metadata directory for storing events, must be writable'
-  method_option :endpoint, :type => :string, :required => true,
+  method_option :endpoint, :type => :string, :default => Onevmcatcher::Settings.endpoint,
                 :aliases => '-e', :desc => 'Datastore endpoint URI or URL'
-  method_option :metadata_dir, :type => :string, :default => DEFAULT_METADATA_DIR,
+  method_option :metadata_dir, :type => :string, :default => Onevmcatcher::Settings.metadata_dir,
                 :aliases => '-m', :desc => 'Path to a metadata directory for storing events, must be writable'
-  method_option :auth, :enum => AVAILABLE_AUTH_METHODS, :default => AVAILABLE_AUTH_METHODS.first,
+  method_option :auth, :enum => AVAILABLE_AUTH_METHODS, :default => Onevmcatcher::Settings.auth,
                 :aliases => '-a', :desc => 'Datastore authentication method'
-  method_option :timeout, :type => :numeric, :default => DEFAULT_TIMEOUT,
+  method_option :timeout, :type => :numeric, :default => Onevmcatcher::Settings.timeout,
                 :aliases => '-t', :desc => 'Default timeout for execution in seconds'
-  method_option :connection_timeout, :type => :numeric, :default => DEFAULT_CONN_TIMEOUT,
+  method_option :connection_timeout, :type => :numeric, :default => Onevmcatcher::Settings.connection_timeout,
                 :aliases => '-c', :desc => 'Default timeout for open connections in seconds'
-  method_option :username, :type => :string, :default => nil,
+  method_option :username, :type => :string, :default => Onevmcatcher::Settings.username,
                 :aliases => '-u', :desc => 'Username for basic authentication'
-  method_option :password, :type => :string, :default => nil,
+  method_option :password, :type => :string, :default => Onevmcatcher::Settings.password,
                 :aliases => '-p', :desc => 'Password for basic authentication'
-  method_option :ca_path, :type => :string, :default => DEFAULT_CA_PATH,
+  method_option :ca_path, :type => :string, :default => Onevmcatcher::Settings.ca_path,
                 :aliases => '-b', :desc => 'Path to CA certificates directory'
-  method_option :ca_file, :type => :string, :default => DEFAULT_CA_FILE,
+  method_option :ca_file, :type => :string, :default => Onevmcatcher::Settings.ca_file,
                 :aliases => '-f', :desc => 'Path to CA certificates in a file'
-  method_option :log_to, :enum => AVAILABLE_LOG_DEVS, :default => 'stderr',
+  method_option :log_to, :enum => AVAILABLE_LOG_DEVS, :default => Onevmcatcher::Settings.log_to,
                 :aliases => '-l', :desc => 'Device for logging output'
-  method_option :log_level, :enum => AVAILABLE_LOG_LEVELS,
-                :default => 'error', :aliases => '-b', :desc => 'Logging level'
-  method_option :debug, :type => :boolean, :default => false, :aliases => '-d', :desc => 'Enable debugging'
-  method_option :skip_ca_check, :type => :boolean, :default => false,
+  method_option :log_level, :enum => AVAILABLE_LOG_LEVELS, :default => Onevmcatcher::Settings.log_level,
+                :aliases => '-b', :desc => 'Logging level'
+  method_option :debug, :type => :boolean, :default => Onevmcatcher::Settings.debug,
+                :aliases => '-d', :desc => 'Enable debugging'
+  method_option :skip_ca_check, :type => :boolean, :default => Onevmcatcher::Settings.skip_ca_check,
                 :aliases => '-s', :desc => 'Skip server certificate verification'
   def sync
     opts = normalize_options
