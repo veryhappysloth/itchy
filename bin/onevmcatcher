@@ -23,7 +23,9 @@ require 'thor'
 require 'onevmcatcher'
 require 'openssl'
 
-#
+# Executable wrapper around onevmcatcher's libraries.
+# Parses and validates user input and triggers internal
+# logic.
 class OnevmcatcherRunnable < Thor
   include Thor::Actions
 
@@ -32,7 +34,8 @@ class OnevmcatcherRunnable < Thor
   AVAILABLE_LOG_LEVELS   = ['debug', 'info', 'warn', 'error', 'fatal', 'unknown'].freeze
   AVAILABLE_AUTH_METHODS = ['none', 'basic'].freeze
 
-  #
+  # Static method required by Thor to make certain
+  # actions work.
   def self.source_root
     File.expand_path(File.join('..', '..', 'templates'), __FILE__)
   end
@@ -47,6 +50,7 @@ class OnevmcatcherRunnable < Thor
   method_option :debug, :type => :boolean, :default => Onevmcatcher::Settings.debug,
                 :aliases => '-d', :desc => 'Enable debugging'
   def archive
+    check_restrictions
     opts = normalize_options
     logger = init_logger(opts)
 
@@ -91,6 +95,7 @@ class OnevmcatcherRunnable < Thor
   method_option :skip_ca_check, :type => :boolean, :default => Onevmcatcher::Settings.skip_ca_check,
                 :aliases => '-s', :desc => 'Skip server certificate verification'
   def sync
+    check_restrictions
     opts = normalize_options
     logger = init_logger(opts)
 
@@ -103,7 +108,11 @@ class OnevmcatcherRunnable < Thor
 
   private
 
+  # Converts Thor options into a Hashie::Mash instance
+  # with some additional conversions and modifications.
+  # Helps with integration later on.
   #
+  # @return [Hashie::Mash] hash-like structure with options
   def normalize_options
     opts = ::Hashie::Mash.new(options)
 
@@ -124,7 +133,23 @@ class OnevmcatcherRunnable < Thor
     opts
   end
 
+  # Checks additional restrictions not enforced by thor.
+  # Mostly stuff broken by using SettingsLogic with thor.
+  def check_restrictions
+    fail "Datastore #{options[:datastore].inspect} " \
+         "is not allowed!" unless AVAILABLE_DATASTORES.include?(options[:datastore])
+    fail "Logging target #{options[:log_to].inspect} " \
+         "is not allowed!" unless AVAILABLE_LOG_DEVS.include?(options[:log_to])
+    fail "Logging level #{options[:log_level].inspect} " \
+         "is not allowed!" unless AVAILABLE_LOG_LEVELS.include?(options[:log_level])
+    fail "Authentication #{options[:auth].inspect} " \
+         "is not allowed!" unless AVAILABLE_AUTH_METHODS.include?(options[:auth])
+  end
+
+  # Initializes logging for Onevmcatcher::Log.
   #
+  # @param opts [Hashie::Mash] hash-like structure with options
+  # @return [Onevmcatcher::Log] logger instance
   def init_logger(opts)
     logger = Onevmcatcher::Log.new(opts.log_to)
     logger.level = opts.log_level
