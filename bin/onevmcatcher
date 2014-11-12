@@ -96,6 +96,7 @@ class OnevmcatcherRunnable < Thor
                 :aliases => '-s', :desc => 'Skip server certificate verification'
   def sync
     check_restrictions
+    check_sync_restrictions
     opts = normalize_options
     logger = init_logger(opts)
 
@@ -136,12 +137,15 @@ class OnevmcatcherRunnable < Thor
   # Checks additional restrictions not enforced by thor.
   # Mostly stuff broken by using SettingsLogic with thor.
   def check_restrictions
-    fail "Datastore #{options[:datastore].inspect} " \
-         "is not allowed!" unless AVAILABLE_DATASTORES.include?(options[:datastore])
     fail "Logging target #{options[:log_to].inspect} " \
          "is not allowed!" unless AVAILABLE_LOG_DEVS.include?(options[:log_to])
     fail "Logging level #{options[:log_level].inspect} " \
          "is not allowed!" unless AVAILABLE_LOG_LEVELS.include?(options[:log_level])
+  end
+
+  def check_sync_restrictions
+    fail "Datastore #{options[:datastore].inspect} " \
+         "is not allowed!" unless AVAILABLE_DATASTORES.include?(options[:datastore])
     fail "Authentication #{options[:auth].inspect} " \
          "is not allowed!" unless AVAILABLE_AUTH_METHODS.include?(options[:auth])
   end
