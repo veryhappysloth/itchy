@@ -20,6 +20,7 @@ module Onevmcatcher
     # directory specified in `options` provided to
     # the constructor.
     def sync!
+      Onevmcatcher::Log.info "[#{self.class.name}] Synchronizing images from #{options.metadata_dir.inspect}"
       # TODO: do something
     end
 
@@ -27,6 +28,8 @@ module Onevmcatcher
 
     # Runs basic check on the metadata directory.
     def init_metadata_dir!
+      Onevmcatcher::Log.debug "[#{self.class.name}] Checking metadata directory #{options.metadata_dir.inspect}"
+
       fail ArgumentError, 'Metadata directory is ' \
                           'not a directory!' unless File.directory? options.metadata_dir
       fail ArgumentError, 'Metadata directory is ' \

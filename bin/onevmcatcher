@@ -54,9 +54,9 @@ class OnevmcatcherRunnable < Thor
     opts = normalize_options
     logger = init_logger(opts)
 
-    Onevmcatcher::Log.info 'Archiver started'
-    Onevmcatcher::Log.debug "With ENV: #{ENV.inspect}"
-    Onevmcatcher::Log.debug "With options: #{opts.inspect}"
+    Onevmcatcher::Log.info "[#{self.class.name}] Archiver started"
+    Onevmcatcher::Log.debug "[#{self.class.name}] With ENV: #{ENV.inspect}"
+    Onevmcatcher::Log.debug "[#{self.class.name}] With options: #{opts.inspect}"
 
     Onevmcatcher::MetadataArchiver.new(
       Onevmcatcher::VmcatcherEvent.new(ENV),
@@ -99,9 +99,9 @@ class OnevmcatcherRunnable < Thor
     opts = normalize_options
     logger = init_logger(opts)
 
-    Onevmcatcher::Log.info 'Syncmaster started'
-    Onevmcatcher::Log.debug "With ENV: #{ENV.inspect}"
-    Onevmcatcher::Log.debug "With options: #{opts.inspect}"
+    Onevmcatcher::Log.info "[#{self.class.name}] Syncmaster started"
+    Onevmcatcher::Log.debug "[#{self.class.name}] With ENV: #{ENV.inspect}"
+    Onevmcatcher::Log.debug "[#{self.class.name}] With options: #{opts.inspect}"
 
     Onevmcatcher::ImageSyncmaster.new(opts).sync!
   end

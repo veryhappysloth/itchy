@@ -21,35 +21,25 @@ module Onevmcatcher
       @vmc_event = vmc_event
       @vmc_configuration = vmc_configuration
       @options = options || ::Hashie::Mash.new
-
-      init_metadata_dir!
     end
 
     # Triggers archiving of the provided event. Event is written
     # to the file system as a JSON-formatted document for delayed
     # processing.
     def archive!
-      temp_file = ::Tempfile.new('vmcatcher_event_metadata_archive')
-      permanent_file_path = ::File.join(
-        options.metadata_dir,
-        "#{vmc_event.type || 'Unknown'}_#{vmc_event.dc_identifier || 'NoID'}_#{::Time.now.to_i}.json"
-      )
+      Onevmcatcher::Log.info "[#{self.class.name}] Archiving " \
+                             "#{vmc_event.type.inspect} " \
+                             "for #{vmc_event.dc_identifier.inspect}"
 
-      temp_file.write vmc_event.to_pretty_json
-      temp_file.flush
+      begin
+        event_handler = Onevmcatcher::EventHandlers.const_get("#{vmc_event.type}EventHandler")
+      rescue NameError => ex
+        fail Onevmcatcher::Errors::UnknownEventError,
+             "Unknown event type #{vmc_event.type.inspect} detected: #{ex.message}"
+      end
 
-      ::FileUtils.cp temp_file.path, permanent_file_path
-      temp_file.close
-    end
-
-    private
-
-    # Runs basic check on the metadata directory.
-    def init_metadata_dir!
-      fail ArgumentError, 'Metadata directory is ' \
-                          'not a directory!' unless File.directory? options.metadata_dir
-      fail ArgumentError, 'Metadata directory is ' \
-                          'not writable!' unless File.writable? options.metadata_dir
+      event_handler = event_handler.new(vmc_event, vmc_configuration, options)
+      event_handler.archive!
     end
 
   end
