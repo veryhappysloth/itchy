@@ -20,8 +20,24 @@ module Onevmcatcher
     # directory specified in `options` provided to
     # the constructor.
     def sync!
-      Onevmcatcher::Log.info "[#{self.class.name}] Synchronizing images from #{options.metadata_dir.inspect}"
+      Onevmcatcher::Log.info "[#{self.class.name}] Synchronizing events from #{options.metadata_dir.inspect}"
       # TODO: do something
+      #
+      # find_archived_event_files.each do |event_file|
+      #   begin
+      #     read_file event_file
+      #     locate_event_handler
+      #     instantiate_handler
+      #     run_handler with_event
+      #   rescue NameError => nex
+      #     log_missing_handler
+      #   rescue => ex
+      #     log_stuff # we have to continue
+      #   end
+      #
+      #   remove_event_file
+      # end
+      #
     end
 
     private
@@ -33,7 +49,7 @@ module Onevmcatcher
       fail ArgumentError, 'Metadata directory is ' \
                           'not a directory!' unless File.directory? options.metadata_dir
       fail ArgumentError, 'Metadata directory is ' \
-                          'not writable!' unless File.readable? options.metadata_dir
+                          'not readable!' unless File.readable? options.metadata_dir
     end
 
   end

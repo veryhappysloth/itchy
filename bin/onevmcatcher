@@ -54,14 +54,12 @@ class OnevmcatcherRunnable < Thor
     logger = init_logger(opts)
 
     Onevmcatcher::Log.info "[#{self.class.name}] Archiver started"
-    Onevmcatcher::Log.debug "[#{self.class.name}] With ENV: #{ENV.inspect}"
     Onevmcatcher::Log.debug "[#{self.class.name}] With options: #{opts.inspect}"
 
     Onevmcatcher::MetadataArchiver.new(
-      Onevmcatcher::VmcatcherEvent.new(ENV),
       Onevmcatcher::VmcatcherConfiguration.new(ENV),
       opts
-    ).archive!
+    ).archive!(Onevmcatcher::VmcatcherEvent.new(ENV))
   end
 
   desc 'sync', 'Sync archived vmcatcher events and upload images into the datastore'
@@ -100,7 +98,6 @@ class OnevmcatcherRunnable < Thor
     logger = init_logger(opts)
 
     Onevmcatcher::Log.info "[#{self.class.name}] Syncmaster started"
-    Onevmcatcher::Log.debug "[#{self.class.name}] With ENV: #{ENV.inspect}"
     Onevmcatcher::Log.debug "[#{self.class.name}] With options: #{opts.inspect}"
 
     Onevmcatcher::ImageSyncmaster.new(opts).sync!
