@@ -13,23 +13,23 @@ module Onevmcatcher::EventHandlers
     # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current vmcatcher configuration
     # @param options [Settingslogic] current onevmcatcher configuration
     def initialize(vmcatcher_configuration, options)
-      fail(
-        ArgumentError,
-        '\'vmcatcher_configuration\' must be an instance of Onevmcatcher::VmcatcherConfiguration!'
-      ) unless vmcatcher_configuration.kind_of? Onevmcatcher::VmcatcherConfiguration
+      unless vmcatcher_configuration.kind_of?(Onevmcatcher::VmcatcherConfiguration)
+        fail ArgumentError, '\'vmcatcher_configuration\' must be an instance of ' \
+                            'Onevmcatcher::VmcatcherConfiguration!'
+      end
 
       @vmcatcher_configuration = vmcatcher_configuration
-      @options = options
+      @options = options || ::Hashie::Mash.new
     end
 
     # Triggers an archiving procedure on the registered event.
     #
     # @param vmcatcher_event [Onevmcatcher::VmcatcherEvent] event being archived
     def archive!(vmcatcher_event)
-      fail(
-        ArgumentError,
-        '\'vmcatcher_event\' must be an instance of Onevmcatcher::VmcatcherEvent!'
-      ) unless vmcatcher_event.kind_of? Onevmcatcher::VmcatcherEvent
+      unless vmcatcher_event.kind_of?(Onevmcatcher::VmcatcherEvent)
+        fail ArgumentError, '\'vmcatcher_event\' must be an instance of ' \
+                            'Onevmcatcher::VmcatcherEvent!'
+      end
 
       Onevmcatcher::Log.info "[#{self.class.name}] Saving " \
                              "#{vmcatcher_event.type.inspect} " \
@@ -54,10 +54,10 @@ module Onevmcatcher::EventHandlers
     #
     # @param vmcatcher_event [Onevmcatcher::VmcatcherEvent] event being handled
     def handle!(vmcatcher_event)
-      fail(
-        ArgumentError,
-        '\'vmcatcher_event\' must be an instance of Onevmcatcher::VmcatcherEvent!'
-      ) unless vmcatcher_event.kind_of? Onevmcatcher::VmcatcherEvent
+      unless vmcatcher_event.kind_of?(Onevmcatcher::VmcatcherEvent)
+        fail ArgumentError, '\'vmcatcher_event\' must be an instance of ' \
+                            'Onevmcatcher::VmcatcherEvent!'
+      end
 
       Onevmcatcher::Log.warn "[#{self.class.name}] Processing event " \
                              "#{vmcatcher_event.type.inspect} for " \
