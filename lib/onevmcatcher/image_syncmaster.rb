@@ -71,9 +71,10 @@ module Onevmcatcher
         end
 
         begin
-          events[json] = Onevmcatcher::VmcatcherEvent.new(json)
+          events[json] = Onevmcatcher::VmcatcherEvent.new(::File.read(json))
         rescue => ex
-          Onevmcatcher::Log.error "[#{self.class.name}] Failed to load event from #{json.inspect}"
+          Onevmcatcher::Log.error "[#{self.class.name}] Failed to load event from #{json.inspect}: " \
+                                  "#{ex.message}"
         end
       end
 
@@ -85,8 +86,10 @@ module Onevmcatcher
     # @param event_file [String] path to the event file
     # @param event [Onevmcatcher::VmcatcherEvent] event instance
     def clean_up_event!(event_file, event)
+      Onevmcatcher::Log.info "[#{self.class.name}] Cleaning up #{event_file.inspect}"
+
       begin
-        ::FileUtil.rm_f event_file
+        ::FileUtils.rm_f event_file
       rescue => ex
         Onevmcatcher::Log.fatal "[#{self.class.name}] Failed to clean up event " \
                                 "#{event.type.inspect} from #{event_file.inspect}: " \
