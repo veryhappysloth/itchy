@@ -10,8 +10,10 @@ module Onevmcatcher
     # Creates an environment instance with pre-filtered
     # attributes.
     #
-    # @param env [Object] hash-like object storing the raw environment
+    # @param env [Object] hash-like or JSON-like object storing the raw environment
     def initialize(env)
+      env = ::JSON.parse(env) if env.kind_of?(String)
+
       @attributes = Onevmcatcher::Helpers::VmcatcherEnvHelper.select_from_env(
         env,
         self.class::REGISTERED_ENV_KEYS
@@ -32,6 +34,18 @@ module Onevmcatcher
     # @return [String] JSON document
     def to_json
       ::JSON.generate @attributes
+    end
+
+    class << self
+
+      # Creates an instance from a JSON document.
+      #
+      # @param json [String] JSON to create an instance from
+      # @return [Onevmcatcher::VmcatcherEnv] instance
+      def from_json(json)
+        self.new ::JSON.parse(json)
+      end
+
     end
 
   end

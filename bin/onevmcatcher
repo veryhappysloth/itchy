@@ -100,7 +100,10 @@ class OnevmcatcherRunnable < Thor
     Onevmcatcher::Log.info "[#{self.class.name}] Syncmaster started"
     Onevmcatcher::Log.debug "[#{self.class.name}] With options: #{opts.inspect}"
 
-    Onevmcatcher::ImageSyncmaster.new(opts).sync!
+    Onevmcatcher::ImageSyncmaster.new(
+      Onevmcatcher::VmcatcherConfiguration.new(ENV),
+      opts
+    ).sync!
   end
 
   private
