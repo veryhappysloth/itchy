@@ -41,6 +41,8 @@ module Onevmcatcher
                                   "from #{event_file.inspect} failed: #{ex.message}"
         end
       end
+
+      Onevmcatcher::Log.info "[#{self.class.name}] Synchronization from #{options.metadata_dir.inspect} finished"
     end
 
     private
