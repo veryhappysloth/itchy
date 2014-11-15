@@ -64,5 +64,14 @@ module Onevmcatcher::EventHandlers
                              "#{vmcatcher_event.dc_identifier.inspect}"
     end
 
+    protected
+
+    # Creates a datastore instance from options.
+    #
+    # @return [BaseDatastoreConnector] datastore instance
+    def datastore_instance
+      options.datastore.new(options)
+    end
+
   end
 end

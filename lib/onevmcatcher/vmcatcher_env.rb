@@ -25,7 +25,7 @@ module Onevmcatcher
     #
     # @return [String] pretty JSON document
     def to_pretty_json
-      ::JSON.pretty_generate @attributes
+      ::JSON.pretty_generate attributes
     end
 
     # Generates an ordinary JSON document
@@ -33,7 +33,17 @@ module Onevmcatcher
     #
     # @return [String] JSON document
     def to_json
-      ::JSON.generate @attributes
+      ::JSON.generate attributes
+    end
+
+    # Converts event attributes into a hash-like
+    # structure.
+    #
+    # @return [Hashie::Mash] hash-like structure with metadata
+    def to_hash
+      attr_converted = ::Hashie::Mash.new
+      attributes.each_pair { |name, val| attr_converted[name.downcase] = val }
+      attr_converted
     end
 
     class << self

@@ -4,7 +4,9 @@ module Onevmcatcher::EventHandlers
 
     def handle!(vmcatcher_event)
       super
-      Onevmcatcher::Log.warn "[#{self.class.name}] Just ignoring #{vmcatcher_event.type.inspect}"
+      Onevmcatcher::Log.info "[#{self.class.name}] Expiring image " \
+                             "for #{vmcatcher_event.dc_identifier.inspect}"
+      datastore_instance.expire_image! vmcatcher_event
     end
 
   end
