@@ -4,7 +4,7 @@ module Onevmcatcher::EventHandlers
   class BaseEventHandler
 
     TEMPFILE_BASE = 'vmcatcher_event_metadata_archive'
-    EVENT_FILE_REGEXP = /^(?<type>[[:alnum:]]+)_(?<dc_identifier>[[[:alnum:]]-]+)_(?<time>\d+)\.json$/
+    EVENT_FILE_REGEXP = /^(?<time>\d+)_(?<type>[[:alnum:]]+)_(?<dc_identifier>[[[:alnum:]]-]+)\.json$/
 
     attr_reader :vmcatcher_configuration, :options
 
@@ -38,7 +38,7 @@ module Onevmcatcher::EventHandlers
       temp_file = ::Tempfile.new(TEMPFILE_BASE)
       permanent_file_path = ::File.join(
         options.metadata_dir,
-        "#{vmcatcher_event.type || 'Unknown'}_#{vmcatcher_event.dc_identifier || 'NoID'}_#{::Time.now.to_i}.json"
+        "#{::Time.now.to_i}_#{vmcatcher_event.type || 'Unknown'}_#{vmcatcher_event.dc_identifier || 'NoID'}.json"
       )
 
       temp_file.write(vmcatcher_event.to_pretty_json)
