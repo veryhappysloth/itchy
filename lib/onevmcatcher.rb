@@ -1,7 +1,6 @@
 require 'active_support/all'
 require 'settingslogic'
 require 'multi_json'
-require 'opennebula'
 require 'mixlib/shellout'
 require 'logger'
 require 'uri'

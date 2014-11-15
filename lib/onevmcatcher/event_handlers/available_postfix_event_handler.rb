@@ -6,6 +6,7 @@ module Onevmcatcher::EventHandlers
       super
       Onevmcatcher::Log.info "[#{self.class.name}] Uploading updated image " \
                              "for #{vmcatcher_event.dc_identifier.inspect}"
+      # TODO: integrate ImageTransformer
       datastore_instance.register_image! vmcatcher_event
     end
 
