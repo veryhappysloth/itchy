@@ -29,5 +29,11 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'hashie', '~> 3.3', '>= 3.3.1'
   gem.add_dependency 'thor', '~> 0.19', '>= 0.19.1'
 
+  gem.add_development_dependency 'bundler', '~> 1.6'
+  gem.add_development_dependency 'rake', '~> 10.0'
+  gem.add_development_dependency 'rspec', '~> 3.0.0'
+  gem.add_development_dependency 'simplecov', '~> 0.9.0'
+  gem.add_development_dependency 'rubygems-tasks', '~> 0.2.4'
+
   gem.required_ruby_version = ">= 1.9.3"
 end
