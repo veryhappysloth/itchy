@@ -9,10 +9,10 @@ module Onevmcatcher
       @options = options
       @inputs = ([] << KNOWN_IMAGE_FORMATS << KNOWN_IMAGE_ARCHIVES).flatten
 
-      fail "Unsupported input image format specified! " \
-           "#{@inputs.inspect}" unless (@options.input_image_formats & @inputs).empty?
-      fail "Unsupported output image format specified! " \
-           "#{KNOWN_IMAGE_FORMATS.inspect}" unless (@options.output_image_formats & KNOWN_IMAGE_FORMATS).empty?
+      fail "Unsupported input image format enabled in configuration! " \
+           "#{@inputs.inspect}" unless (@options.input_image_formats - @inputs).empty?
+      fail "Unsupported output image format enabled in configuration! " \
+           "#{KNOWN_IMAGE_FORMATS.inspect}" unless (@options.output_image_formats - KNOWN_IMAGE_FORMATS).empty?
     end
 
     def transform!(metadata)
