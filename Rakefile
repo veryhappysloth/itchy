@@ -25,8 +25,3 @@ namespace :rcov do
   end
 
 end
-
-require 'yard'
-YARD::Rake::YardocTask.new(:yard) do |t|
-  t.options = ['--any', '--extra', '--opts'] # optional
-end
