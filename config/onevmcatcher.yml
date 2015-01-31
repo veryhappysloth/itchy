@@ -1,15 +1,38 @@
 ---
-datastore: opennebula
-endpoint: http://localhost:2633/RPC2
-metadata_dir: /var/spool/onevmcatcher
-auth: none
-username:
-password:
-log_to: stderr
-log_level: error
-ca_path: /etc/grid-security/certificates
-ca_file:
-timeout: 1800
-connection_timeout: 15
-debug: false
-skip_ca_check: false
+defaults: &defaults
+  datastore: opennebula
+  endpoint: http://localhost:2633/RPC2
+  metadata_dir: /var/spool/onevmcatcher
+  template_dir:
+  auth: none
+  username:
+  password:
+  log_to: stderr
+  log_level: error
+  ca_path: /etc/grid-security/certificates
+  ca_file:
+  timeout: 1800
+  connection_timeout: 15
+  debug: false
+  skip_ca_check: false
+  input_image_formats:
+  - raw
+  - ova
+  output_image_formats:
+  - raw
+  qemu_img_binary: /usr/bin/qemu-img
+
+###############################################
+#######  DO NOT EDIT AFTER THIS POINT  ########
+###############################################
+
+production:
+  <<: *defaults
+
+development:
+  <<: *defaults
+  log_level: debug
+
+test:
+  <<: *defaults
+  log_level: debug

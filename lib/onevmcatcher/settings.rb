@@ -28,6 +28,8 @@ module Onevmcatcher
     source GLOBAL_CONF if File.readable? GLOBAL_CONF
     source GEM_CONF
 
+    namespace ENV['RAILS_ENV'].blank? ? 'production' : ENV['RAILS_ENV']
+
     load!
   end
 end

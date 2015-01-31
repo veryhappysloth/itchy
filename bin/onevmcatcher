@@ -65,10 +65,18 @@ class OnevmcatcherRunnable < Thor
   desc 'sync', 'Sync archived vmcatcher events and upload images into the datastore'
   method_option :datastore, :enum => AVAILABLE_DATASTORES, :default => Onevmcatcher::Settings.datastore,
                 :aliases => '-o', :desc => 'Path to a metadata directory for storing events, must be writable'
+  method_option :input_image_formats, :type => :array, :default => Onevmcatcher::Settings.input_image_formats,
+                :aliases => '-i', :desc => 'Allowed input image formats, as declared in VMCATCHER_EVENT_HV_FORMAT'
+  method_option :output_image_formats, :type => :array, :default => Onevmcatcher::Settings.output_image_formats,
+                :aliases => '-j', :desc => 'Allowed output image formats, for direct upload into the datastore'
+  method_option :qemu_img_binary, :type => :string, :default => Onevmcatcher::Settings.qemu_img_binary,
+                :aliases => '-k', :desc => 'Path to a custom qemu-img binary for image transformations'
   method_option :endpoint, :type => :string, :default => Onevmcatcher::Settings.endpoint,
                 :aliases => '-e', :desc => 'Datastore endpoint URI or URL'
   method_option :metadata_dir, :type => :string, :default => Onevmcatcher::Settings.metadata_dir,
                 :aliases => '-m', :desc => 'Path to a metadata directory for storing events, must be writable'
+  method_option :template_dir, :type => :string, :default => Onevmcatcher::Settings.template_dir,
+                :aliases => '-g', :desc => 'Path to a template directory, must be readable'
   method_option :auth, :enum => AVAILABLE_AUTH_METHODS, :default => Onevmcatcher::Settings.auth,
                 :aliases => '-a', :desc => 'Datastore authentication method'
   method_option :timeout, :type => :numeric, :default => Onevmcatcher::Settings.timeout,

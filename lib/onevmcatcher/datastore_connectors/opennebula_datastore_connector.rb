@@ -5,6 +5,7 @@ module Onevmcatcher::DatastoreConnectors
   class OpennebulaDatastoreConnector < BaseDatastoreConnector
 
     ALLOWED_AUTHS = %w(none basic).freeze
+    TEMPLATE_NAME = 'opennebula'
 
     def expire_image!(metadata)
       Onevmcatcher::Log.info "[#{self.class.name}] Expiring image & template " \
