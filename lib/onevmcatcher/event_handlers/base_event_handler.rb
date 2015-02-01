@@ -59,7 +59,7 @@ module Onevmcatcher::EventHandlers
                             'Onevmcatcher::VmcatcherEvent!'
       end
 
-      Onevmcatcher::Log.warn "[#{self.class.name}] Processing event " \
+      Onevmcatcher::Log.info "[#{self.class.name}] Processing event " \
                              "#{vmcatcher_event.type.inspect} for " \
                              "#{vmcatcher_event.dc_identifier.inspect}"
     end

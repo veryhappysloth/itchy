@@ -27,7 +27,7 @@ module Onevmcatcher
     def sync!
       Onevmcatcher::Log.info "[#{self.class.name}] Synchronizing events from #{options.metadata_dir.inspect}"
 
-      find_archived_events.each_pair do |event_file, event|
+      archived_events do |event_file, event|
         begin
           event_handler = Onevmcatcher::EventHandlers.const_get("#{event.type}EventHandler")
           event_handler = event_handler.new(vmc_configuration, options)
@@ -57,13 +57,12 @@ module Onevmcatcher
                           'not readable!' unless File.readable? options.metadata_dir
     end
 
-    # Locates and reads archived events. Provides a hash-like structure
-    # where absolute paths are pointing to event instances.
+    # Locates and reads archived events. Each event is given for
+    # processing to the provided block. Events are processed in-order,
+    # order is established in the underlying filesystem.
     #
-    # @return [Hash] JSON documents with events
-    def find_archived_events
-      events = {}
-
+    # @param block [Block] block processing archived events
+    def archived_events(&block)
       ::Dir.glob(::File.join(options.metadata_dir, '*.json')) do |json|
         json_short = json.split(::File::SEPARATOR).last
 
@@ -73,14 +72,14 @@ module Onevmcatcher
         end
 
         begin
-          events[json] = Onevmcatcher::VmcatcherEvent.new(::File.read(json))
+          vmc_event_from_json = Onevmcatcher::VmcatcherEvent.new(::File.read(json))
         rescue => ex
           Onevmcatcher::Log.error "[#{self.class.name}] Failed to load event from #{json.inspect}: " \
                                   "#{ex.message}"
         end
-      end
 
-      events
+        block.call(json, vmc_event_from_json)
+      end
     end
 
     # Cleans up after an event has been successfully processed.
