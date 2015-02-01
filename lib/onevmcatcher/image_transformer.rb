@@ -16,16 +16,16 @@ module Onevmcatcher
     end
 
     def transform!(metadata)
-      Onevmcatcher::Log.info "[#{self.class.name}] Transforming image format" \
+      Onevmcatcher::Log.info "[#{self.class.name}] Transforming image format " \
                              "for #{metadata.dc_identifier.inspect}"
       image_format = (metadata.hv_format || '').downcase
       unless valid_format?(image_format)
-        fail "Image format #{image_format.inspect}" \
+        fail "Image format #{image_format.inspect} " \
              "is not supported! Supported: #{@inputs.inspect}"
       end
 
       unless enabled_format?(image_format)
-        fail "Image format #{image_format.inspect}" \
+        fail "Image format #{image_format.inspect} " \
              "is not enabled! Enabled: #{@options.input_image_formats.inspect}"
       end
 
@@ -53,17 +53,17 @@ module Onevmcatcher
     end
 
     def unpack_archived!(metadata)
-      Onevmcatcher::Log.info "[#{self.class.name}] Unpacking image from archive" \
+      Onevmcatcher::Log.info "[#{self.class.name}] Unpacking image from archive " \
                              "for #{metadata.dc_identifier.inspect}"
     end
 
     def copy_unpacked!(metadata)
-      Onevmcatcher::Log.info "[#{self.class.name}] Copying image" \
+      Onevmcatcher::Log.info "[#{self.class.name}] Copying image " \
                              "for #{metadata.dc_identifier.inspect}"
     end
 
     def convert_unpacked!(metadata)
-      Onevmcatcher::Log.info "[#{self.class.name}] Converting image" \
+      Onevmcatcher::Log.info "[#{self.class.name}] Converting image " \
                              "for #{metadata.dc_identifier.inspect}"
     end
 
