@@ -63,7 +63,11 @@ module Onevmcatcher
     #
     # @param block [Block] block processing archived events
     def archived_events(&block)
-      ::Dir.glob(::File.join(options.metadata_dir, '*.json')) do |json|
+      arch_events = ::Dir.glob(::File.join(options.metadata_dir, '*.json'))
+      arch_events.sort!
+
+      Onevmcatcher::Log.debug "[#{self.class.name}] Found events: #{arch_events.inspect}"
+      arch_events.each do |json|
         json_short = json.split(::File::SEPARATOR).last
 
         unless Onevmcatcher::EventHandlers::BaseEventHandler::EVENT_FILE_REGEXP =~ json_short
@@ -71,14 +75,22 @@ module Onevmcatcher
           next
         end
 
-        begin
-          vmc_event_from_json = Onevmcatcher::VmcatcherEvent.new(::File.read(json))
-        rescue => ex
-          Onevmcatcher::Log.error "[#{self.class.name}] Failed to load event from #{json.inspect}: " \
-                                  "#{ex.message}"
-        end
+        vmc_event_from_json = read_archived_event(json)
+        block.call(json, vmc_event_from_json) if vmc_event_from_json
+      end
+    end
 
-        block.call(json, vmc_event_from_json)
+    # Reads the given JSON file and creates an event instance.
+    #
+    # @param json [String] path to json event file
+    # @return [NilClass, Onevmcatcher::VmcatcherEvent] event instance or nil
+    def read_archived_event(json)
+      begin
+        Onevmcatcher::VmcatcherEvent.new(::File.read(json))
+      rescue => ex
+        Onevmcatcher::Log.error "[#{self.class.name}] Failed to load event from #{json.inspect}: " \
+                                "#{ex.message}"
+        return
       end
     end
 
