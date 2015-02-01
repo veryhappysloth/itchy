@@ -24,7 +24,8 @@ module Onevmcatcher
     # unpacking of archive & conversion of image files.
     #
     # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
-    def transform!(metadata)
+    # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
+    def transform!(metadata, vmcatcher_configuration)
       Onevmcatcher::Log.info "[#{self.class.name}] Transforming image format " \
                              "for #{metadata.dc_identifier.inspect}"
       image_format = (metadata.hv_format || '').downcase
@@ -39,12 +40,12 @@ module Onevmcatcher
       end
 
       if archive?(image_format)
-        unpack_archived!(metadata)
+        unpack_archived!(metadata, vmcatcher_configuration)
       else
-        copy_unpacked!(metadata)
+        copy_unpacked!(metadata, vmcatcher_configuration)
       end
 
-      convert_unpacked!(metadata)
+      convert_unpacked!(metadata, vmcatcher_configuration)
     end
 
     private
@@ -76,17 +77,29 @@ module Onevmcatcher
       KNOWN_IMAGE_ARCHIVES.include?(image_format)
     end
 
-    def unpack_archived!(metadata)
+    #
+    #
+    # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
+    # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
+    def unpack_archived!(metadata, vmcatcher_configuration)
       Onevmcatcher::Log.info "[#{self.class.name}] Unpacking image from archive " \
                              "for #{metadata.dc_identifier.inspect}"
     end
 
-    def copy_unpacked!(metadata)
+    #
+    #
+    # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
+    # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
+    def copy_unpacked!(metadata, vmcatcher_configuration)
       Onevmcatcher::Log.info "[#{self.class.name}] Copying image " \
                              "for #{metadata.dc_identifier.inspect}"
     end
 
-    def convert_unpacked!(metadata)
+    #
+    #
+    # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
+    # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
+    def convert_unpacked!(metadata, vmcatcher_configuration)
       Onevmcatcher::Log.info "[#{self.class.name}] Converting image " \
                              "for #{metadata.dc_identifier.inspect}"
     end

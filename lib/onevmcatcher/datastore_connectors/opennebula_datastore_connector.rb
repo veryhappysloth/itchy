@@ -12,7 +12,7 @@ module Onevmcatcher::DatastoreConnectors
                              "for #{metadata.dc_identifier.inspect}"
     end
 
-    def register_image!(metadata)
+    def register_image!(metadata, vmcatcher_configuration)
       Onevmcatcher::Log.info "[#{self.class.name}] Registering image & template " \
                              "for #{metadata.dc_identifier.inspect}"
     end

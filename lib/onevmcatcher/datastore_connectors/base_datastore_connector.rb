@@ -17,7 +17,8 @@ module Onevmcatcher::DatastoreConnectors
     # Uploads/registers new image to the datastore.
     #
     # @param metadata [Onevmcatcher::VmcatcherEvent] image information
-    def register_image!(metadata); end
+    # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
+    def register_image!(metadata, vmcatcher_configuration); end
 
   end
 end
