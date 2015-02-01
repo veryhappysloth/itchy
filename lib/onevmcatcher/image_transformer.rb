@@ -2,9 +2,13 @@ module Onevmcatcher
   # Wraps image format conversion methods and helpers.
   class ImageTransformer
 
+    # Registered image formats and archives
     KNOWN_IMAGE_ARCHIVES = %w(ova tar tar.gz).freeze
     KNOWN_IMAGE_FORMATS  = %w(cow dmg parallels qcow qcow2 raw vdi vmdk).freeze
 
+    # Creates a class instance.
+    #
+    # @param options [Hash] configuration options
     def initialize(options = {})
       @options = options
       @inputs = ([] << KNOWN_IMAGE_FORMATS << KNOWN_IMAGE_ARCHIVES).flatten
@@ -15,6 +19,11 @@ module Onevmcatcher
            "#{KNOWN_IMAGE_FORMATS.inspect}" unless (@options.output_image_formats - KNOWN_IMAGE_FORMATS).empty?
     end
 
+    # Transforms image(s) associated with the given event to formats
+    # preferred by the underlying image datastore. This process includes
+    # unpacking of archive & conversion of image files.
+    #
+    # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
     def transform!(metadata)
       Onevmcatcher::Log.info "[#{self.class.name}] Transforming image format " \
                              "for #{metadata.dc_identifier.inspect}"
@@ -40,14 +49,29 @@ module Onevmcatcher
 
     private
 
+    # Checks the given format against a list of available
+    # image formats.
+    #
+    # @param image_format [String] name of the image format
+    # @return [Boolean] validity of the given image format
     def valid_format?(image_format)
       @inputs.include?(image_format)
     end
 
+    # Checks the given format against a list of enabled
+    # image formats.
+    #
+    # @param image_format [String] name of the image format
+    # @return [Boolean] enabled or not
     def enabled_format?(image_format)
       @options.input_image_formats.include?(image_format)
     end
 
+    # Checks the given format against a list of known
+    # archive formats containing images inside.
+    #
+    # @param image_format [String] name of the image format
+    # @return [Boolean] format is or isn't an archive with images inside
     def archive?(image_format)
       KNOWN_IMAGE_ARCHIVES.include?(image_format)
     end
