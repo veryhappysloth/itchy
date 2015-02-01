@@ -3,7 +3,7 @@ module Onevmcatcher
   class ImageTransformer
 
     # Registered image formats and archives
-    KNOWN_IMAGE_ARCHIVES = %w(ova tar tar.gz).freeze
+    KNOWN_IMAGE_ARCHIVES = %w(ova tar).freeze
     KNOWN_IMAGE_FORMATS  = %w(cow dmg parallels qcow qcow2 raw vdi vmdk).freeze
 
     # Creates a class instance.
@@ -25,6 +25,7 @@ module Onevmcatcher
     #
     # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
     # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
+    # @return [String] directory with converted images for further processing
     def transform!(metadata, vmcatcher_configuration)
       Onevmcatcher::Log.info "[#{self.class.name}] Transforming image format " \
                              "for #{metadata.dc_identifier.inspect}"
@@ -39,13 +40,13 @@ module Onevmcatcher
              "is not enabled! Enabled: #{@options.input_image_formats.inspect}"
       end
 
-      if archive?(image_format)
-        unpack_archived!(metadata, vmcatcher_configuration)
-      else
-        copy_unpacked!(metadata, vmcatcher_configuration)
-      end
+      unpacking_dir = if archive?(image_format)
+                        unpack_archived!(metadata, vmcatcher_configuration)
+                      else
+                        copy_unpacked!(metadata, vmcatcher_configuration)
+                      end
 
-      convert_unpacked!(metadata, vmcatcher_configuration)
+      convert_unpacked!(unpacking_dir, metadata, vmcatcher_configuration)
     end
 
     private
@@ -81,27 +82,85 @@ module Onevmcatcher
     #
     # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
     # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
+    # @return [String] output directory with unpacked files
     def unpack_archived!(metadata, vmcatcher_configuration)
       Onevmcatcher::Log.info "[#{self.class.name}] Unpacking image from archive " \
                              "for #{metadata.dc_identifier.inspect}"
+
+      unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration)
+      tar_cmd = ::Mixlib::ShellOut.new("/bin/tar",
+                                       "--restrict -C #{unpacking_dir} " \
+                                       "-xvf #{orig_image_file(metadata, vmcatcher_configuration)}",
+                                       :env => nil, :cwd => '/tmp')
+      tar_cmd.run_command
+      tar_cmd.error!
+
+      unpacking_dir
     end
 
     #
     #
     # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
     # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
+    # @return [String] output directory with copied files
     def copy_unpacked!(metadata, vmcatcher_configuration)
       Onevmcatcher::Log.info "[#{self.class.name}] Copying image " \
                              "for #{metadata.dc_identifier.inspect}"
+      unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration)
+
+      begin
+        ::FileUtils.ln_sf(
+          orig_image_file(metadata, vmcatcher_configuration),
+          unpacking_dir
+        )
+      rescue => ex
+        Onevmcatcher::Log.fatal "[#{self.class.name}] Failed to create a link (copy) " \
+                                "for #{metadata.dc_identifier.inspect}: " \
+                                "#{ex.message}"
+        fail ex
+      end
+
+      unpacking_dir
+    end
+
+    #
+    #
+    # @param unpacking_dir [String] directory with unpacked image files
+    # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
+    # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
+    # @return [String] directory with converted images for further processing
+    def convert_unpacked!(unpacking_dir, metadata, vmcatcher_configuration)
+      Onevmcatcher::Log.info "[#{self.class.name}] Converting image(s) " \
+                             "in #{unpacking_dir.inspect} for #{metadata.dc_identifier.inspect}"
+      # TODO: impl
+      "#{unpacking_dir}/converted"
     end
 
     #
     #
     # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
     # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
-    def convert_unpacked!(metadata, vmcatcher_configuration)
-      Onevmcatcher::Log.info "[#{self.class.name}] Converting image " \
-                             "for #{metadata.dc_identifier.inspect}"
+    # @return [String] path to the original image downloaded by VMC
+    def orig_image_file(metadata, vmcatcher_configuration)
+      "#{vmcatcher_configuration.cache_dir_cache}/#{metadata.dc_identifier}"
+    end
+
+    #
+    #
+    # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
+    # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
+    # @return [String] path to the newly created image directory
+    def prepare_image_temp_dir(metadata, vmcatcher_configuration)
+      temp_dir = "#{vmcatcher_configuration.cache_dir_cache}/#{metadata.dc_identifier}"
+
+      begin
+        ::FileUtils.mkdir_p temp_dir
+      rescue => ex
+        Onevmcatcher::Log.fatal "[#{self.class.name}] Failed to create a directory " \
+                                "for #{metadata.dc_identifier.inspect}: " \
+                                "#{ex.message}"
+        fail ex
+      end
     end
 
   end
