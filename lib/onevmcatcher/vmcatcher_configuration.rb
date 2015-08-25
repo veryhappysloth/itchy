@@ -43,9 +43,9 @@ module Onevmcatcher
     #|
     #    end
     def method_missing(method_id, *arguments, &block)
-      if KNOWN_METHOD_NAMES.include? method)id.to_s
+      if KNOWN_METHOD_NAMES.include? method_id.to_s
         self.class.send :define_method, method_id do
-          temp = VMCATCHER_ATTR_PREFIX + method_id
+          temp = VMCATCHER_ATTR_PREFIX + method_id.to_s.upcase
           attributes["#{temp}"]
         end
         self.send(method_id)

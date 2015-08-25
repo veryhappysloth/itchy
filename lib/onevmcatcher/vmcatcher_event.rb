@@ -62,8 +62,10 @@ module Onevmcatcher
     def method_missing(method_id, *arguments, &block)
       if KNOWN_METHOD_NAMES.include? method_id.to_s
         self.class.send :define_method, method_id do
-          temp = VMCATCHER_ATTR_PREFIX + method_id
-          attributes["#{temp}"]
+          temp = VMCATCHER_ATTR_PREFIX + method_id.to_s.upcase
+
+          Onevmcatcher::Log.debug "[#{method_id.to_s}] METHOD MISSING CALL "
+          attributes[temp]
         end
         self.send(method_id)
       else

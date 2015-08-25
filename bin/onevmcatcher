@@ -29,7 +29,6 @@ require 'openssl'
 class OnevmcatcherRunnable < Thor
   include Thor::Actions
 
-  AVAILABLE_DATASTORES   = Onevmcatcher::Helpers::DatastoreConnectorsHelper.datastores.freeze
   AVAILABLE_LOG_LEVELS   = ['debug', 'info', 'warn', 'error', 'fatal', 'unknown'].freeze
   AVAILABLE_AUTH_METHODS = ['none', 'basic'].freeze
 
@@ -62,58 +61,6 @@ class OnevmcatcherRunnable < Thor
     ).archive!(Onevmcatcher::VmcatcherEvent.new(ENV))
   end
 
-  desc 'sync', 'Sync archived vmcatcher events and upload images into the datastore'
-  method_option :datastore, :enum => AVAILABLE_DATASTORES, :default => Onevmcatcher::Settings.datastore,
-                :aliases => '-o', :desc => 'Path to a metadata directory for storing events, must be writable'
-  method_option :input_image_formats, :type => :array, :default => Onevmcatcher::Settings.input_image_formats,
-                :aliases => '-i', :desc => 'Allowed input image formats, as declared in VMCATCHER_EVENT_HV_FORMAT'
-  method_option :output_image_formats, :type => :array, :default => Onevmcatcher::Settings.output_image_formats,
-                :aliases => '-j', :desc => 'Allowed output image formats, for direct upload into the datastore'
-  method_option :qemu_img_binary, :type => :string, :default => Onevmcatcher::Settings.qemu_img_binary,
-                :aliases => '-k', :desc => 'Path to a custom qemu-img binary for image transformations'
-  method_option :endpoint, :type => :string, :default => Onevmcatcher::Settings.endpoint,
-                :aliases => '-e', :desc => 'Datastore endpoint URI or URL'
-  method_option :metadata_dir, :type => :string, :default => Onevmcatcher::Settings.metadata_dir,
-                :aliases => '-m', :desc => 'Path to a metadata directory for storing events, must be writable'
-  method_option :template_dir, :type => :string, :default => Onevmcatcher::Settings.template_dir,
-                :aliases => '-g', :desc => 'Path to a template directory, must be readable'
-  method_option :auth, :enum => AVAILABLE_AUTH_METHODS, :default => Onevmcatcher::Settings.auth,
-                :aliases => '-a', :desc => 'Datastore authentication method'
-  method_option :timeout, :type => :numeric, :default => Onevmcatcher::Settings.timeout,
-                :aliases => '-t', :desc => 'Default timeout for execution in seconds'
-  method_option :connection_timeout, :type => :numeric, :default => Onevmcatcher::Settings.connection_timeout,
-                :aliases => '-c', :desc => 'Default timeout for open connections in seconds'
-  method_option :username, :type => :string, :default => Onevmcatcher::Settings.username,
-                :aliases => '-u', :desc => 'Username for basic authentication'
-  method_option :password, :type => :string, :default => Onevmcatcher::Settings.password,
-                :aliases => '-p', :desc => 'Password for basic authentication'
-  method_option :ca_path, :type => :string, :default => Onevmcatcher::Settings.ca_path,
-                :aliases => '-b', :desc => 'Path to CA certificates directory'
-  method_option :ca_file, :type => :string, :default => Onevmcatcher::Settings.ca_file,
-                :aliases => '-f', :desc => 'Path to CA certificates in a file'
-  method_option :log_to, :type => :string, :default => Onevmcatcher::Settings.log_to,
-                :aliases => '-l', :desc => 'Logging output, file path or stderr/stdout'
-  method_option :log_level, :enum => AVAILABLE_LOG_LEVELS, :default => Onevmcatcher::Settings.log_level,
-                :aliases => '-b', :desc => 'Logging level'
-  method_option :debug, :type => :boolean, :default => Onevmcatcher::Settings.debug,
-                :aliases => '-d', :desc => 'Enable debugging'
-  method_option :skip_ca_check, :type => :boolean, :default => Onevmcatcher::Settings.skip_ca_check,
-                :aliases => '-s', :desc => 'Skip server certificate verification'
-  def sync
-    check_restrictions
-    check_sync_restrictions
-    opts = normalize_options
-    logger = init_logger(opts)
-
-    Onevmcatcher::Log.info "[#{self.class.name}] Syncmaster started"
-    Onevmcatcher::Log.debug "[#{self.class.name}] With options: #{opts.inspect}"
-
-    Onevmcatcher::ImageSyncmaster.new(
-      Onevmcatcher::VmcatcherConfiguration.new(ENV),
-      opts
-    ).sync!
-  end
-
   private
 
   # Converts Thor options into a Hashie::Mash instance
@@ -137,10 +84,6 @@ class OnevmcatcherRunnable < Thor
 
     opts.endpoint = URI(options[:endpoint]).to_s if options[:endpoint]
 
-    if options[:datastore]
-      opts.datastore = Onevmcatcher::Helpers::DatastoreConnectorsHelper.datastore_connector(options[:datastore])
-    end
-
     if options[:skip_ca_check]
       silence_warnings { ::OpenSSL::SSL.const_set(:VERIFY_PEER, ::OpenSSL::SSL::VERIFY_NONE) }
     end
@@ -155,13 +98,6 @@ class OnevmcatcherRunnable < Thor
          "is not allowed!" if options[:log_to].nil? || options[:log_to].empty?
     fail "Logging level #{options[:log_level].inspect} " \
          "is not allowed!" unless AVAILABLE_LOG_LEVELS.include?(options[:log_level])
-  end
-
-  def check_sync_restrictions
-    fail "Datastore #{options[:datastore].inspect} " \
-         "is not allowed!" unless AVAILABLE_DATASTORES.include?(options[:datastore])
-    fail "Authentication #{options[:auth].inspect} " \
-         "is not allowed!" unless AVAILABLE_AUTH_METHODS.include?(options[:auth])
   end
 
   # Initializes logging for Onevmcatcher::Log.
