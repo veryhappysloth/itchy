@@ -6,6 +6,12 @@ module Onevmcatcher
     KNOWN_IMAGE_ARCHIVES = %w(ova tar).freeze
     KNOWN_IMAGE_FORMATS  = %w(cow dmg parallels qcow qcow2 raw vdi vmdk).freeze
 
+    # Archive format string msg
+    ARCHIVE_STRING = "POSIX tar archive"
+
+    # REGEX pattern for getting image format
+    FORMAT_PATTERN = "/format:\s(.*?)$/"
+
     # Creates a class instance.
     #
     # @param options [Hash] configuration options
@@ -29,24 +35,20 @@ module Onevmcatcher
     def transform!(metadata, vmcatcher_configuration)
       Onevmcatcher::Log.info "[#{self.class.name}] Transforming image format " \
                              "for #{metadata.dc_identifier.inspect}"
-      image_format = (metadata.hv_format || '').downcase
-      unless valid_format?(image_format)
-        fail "Image format #{image_format.inspect} " \
-             "is not supported! Supported: #{@inputs.inspect}"
+      
+      # Need to change this because we should not trust hv_format                       
+      #image_format = (metadata.hv_format || '').downcase
+
+      if archived?(metadata.dc_identifier.inspect)
+        unpacking_dir = unpack_archived!(metadata, vmcatcher_configuration)
+        # TODO archive_handler(unpacking_dir, metadata, vmcatcher_configuration)
+      else
+        file_format = format?(metadata.dc_identifier.inspect)
+        unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
+        # TODO format_handler(unpacking_dir, metadata, vmcatcher_configuration)
       end
 
-      unless enabled_format?(image_format)
-        fail "Image format #{image_format.inspect} " \
-             "is not enabled! Enabled: #{@options.input_image_formats.inspect}"
-      end
-
-      unpacking_dir = if archive?(image_format)
-                        unpack_archived!(metadata, vmcatcher_configuration)
-                      else
-                        copy_unpacked!(metadata, vmcatcher_configuration)
-                      end
-
-      convert_unpacked!(unpacking_dir, metadata, vmcatcher_configuration)
+      #convert_unpacked!(unpacking_dir, metadata, vmcatcher_configuration)
     end
 
     private
@@ -54,28 +56,22 @@ module Onevmcatcher
     # Checks the given format against a list of available
     # image formats.
     #
-    # @param image_format [String] name of the image format
-    # @return [Boolean] validity of the given image format
-    def valid_format?(image_format)
-      @inputs.include?(image_format)
-    end
-
-    # Checks the given format against a list of enabled
-    # image formats.
-    #
-    # @param image_format [String] name of the image format
-    # @return [Boolean] enabled or not
-    def enabled_format?(image_format)
-      @options.input_image_formats.include?(image_format)
-    end
-
-    # Checks the given format against a list of known
-    # archive formats containing images inside.
-    #
-    # @param image_format [String] name of the image format
-    # @return [Boolean] format is or isn't an archive with images inside
-    def archive?(image_format)
-      KNOWN_IMAGE_ARCHIVES.include?(image_format)
+    # @param unpacking_dir [String] name of the directory with unpacked image files
+    # @return [String] image format
+    def format?(unpacking_dir)
+      KNOW_IMAGE_FORMATS      
+      image_format_tester = Mixlib::ShellOut.new("qemu-img info #{file}")
+      image_format_tester.run_command
+      if image_format_tester.error?
+        Onevmcatcher::Log.error "[#{self.class.name}] Checking file format for" \
+                                "#{file} failed!"
+      end
+      format = image_format_tester.stdout.scan(FORMAT_PATTERN)
+      unless KNOWN_IMAGE_FORMATS.include? format
+        fail "Image format #{format}" \
+             "is unknown and not supported!"
+      end
+      format
     end
 
     #
@@ -163,5 +159,19 @@ module Onevmcatcher
       end
     end
 
-  end
+    #
+    #
+    # @param file [String] inspected file name
+    # @return [Boolean] archived or not
+    def archived?(file)
+      image_format_tester = Mixlib::ShellOut.new("file #{file}")
+      image_format_tester.run_command
+      if image_format_tester.error?
+        Onevmcatcher::Log.error "[#{self.class.name}] Checking file format for" \
+                                "#{file} failed!"
+      end
+      temp = image_format_tester.stdout
+      temp.include? ARCHIVE_STRING
+    end
+
 end

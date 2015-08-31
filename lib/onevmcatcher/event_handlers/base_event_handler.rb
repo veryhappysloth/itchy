@@ -66,13 +66,6 @@ module Onevmcatcher::EventHandlers
 
     protected
 
-    # Creates a datastore instance from options.
-    #
-    # @return [BaseDatastoreConnector] datastore instance
-    def datastore_instance
-      @datastore_instance_cache ||= options.datastore.new(options)
-    end
-
     # Creates an image transformer instance with options.
     #
     # @return [ImageTransformer] image transformer instance

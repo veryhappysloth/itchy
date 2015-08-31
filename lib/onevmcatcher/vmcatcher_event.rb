@@ -49,16 +49,6 @@ module Onevmcatcher
       'VMCATCHER_EVENT_VO'
     ].freeze
 
-    #   REGISTERED_ENV_KEYS.each do |registered_env_key|
-    #     short_env_key = registered_env_key.gsub(/^VMCATCHER_EVENT_/, '')
-
-    #      class_eval %Q|
-    #def #{short_env_key.downcase}
-    #  attributes["#{registered_env_key}"]
-    #end
-    #|
-    #    end
-
     def method_missing(method_id, *arguments, &block)
       if KNOWN_METHOD_NAMES.include? method_id.to_s
         self.class.send :define_method, method_id do
