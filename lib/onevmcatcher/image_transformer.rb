@@ -42,7 +42,7 @@ module Onevmcatcher
       else
         file_format = format?(orig_image_file(metadata, vmchatcher_configuration))
         unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
-        # TODO format_handler(unpacking_dir,file_format, metadata, vmcatcher_configuration)
+        # TODO format_handler(unpacking_dir, file_format, metadata, vmcatcher_configuration)
       end
 
       #convert_unpacked!(unpacking_dir, metadata, vmcatcher_configuration)
