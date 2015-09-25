@@ -38,14 +38,19 @@ module Onevmcatcher
 
       if archived?(metadata.dc_identifier.inspect)
         unpacking_dir = unpack_archived!(metadata, vmcatcher_configuration)
-        # TODO archive_handler(unpacking_dir, metadata, vmcatcher_configuration)
+        converter = Onevmcatcher::FormatConverters::UnpackedFormatConverter.new(unpacking_dir,
+                                                                                metadata,
+                                                                                vmcatcher_configuration)
+        file_format = "unpacked"
+        # TODO here, or in UnpackedFormatConverter find out image format of unpacked image and use it
       else
         file_format = format?(orig_image_file(metadata, vmchatcher_configuration))
         unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
-        # TODO format_handler(unpacking_dir, file_format, metadata, vmcatcher_configuration)
+        converter = Onevmcatcher::FormatConverters::SimpleFormatConverter.new(unpacking_dir,
+                                                                              metadata,
+                                                                              vmcatcher_configuration)
       end
-
-      #convert_unpacked!(unpacking_dir, metadata, vmcatcher_configuration)
+      converter.convert!(file_format, required_format)
     end
 
     private
@@ -113,27 +118,7 @@ module Onevmcatcher
       end
 
       unpacking_dir
-    end
-
-    #
-    #
-    # @param unpacking_dir [String] directory with unpacked image files
-    # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
-    # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
-    # @return [String] directory with converted images for further processing
-    def convert!(unpacking_dir, metadata, vmcatcher_configuration)
-      #TODO tranfsorm this to inherritance of two classes for archived (unpacked) and other formats
-      #in format transformers for archived and others.
-      Onevmcatcher::Log.info "[#{self.class.name}] Converting image(s) " \
-                             "in #{unpacking_dir.inspect} for #{metadata.dc_identifier.inspect}" \
-                             "original format: #{original_format} to required format: #{required_format}"
-      convert_cmd = ::Mixlib::ShellOut.new("qemu-img convert",
-                                           "-f #{original_format} -O #{required_format} #{metadata.dc_identifier.inspect}" \
-                                           "#{unpacking_dir}/converted/#{metadata.dc_identifier.inspect}")
-      convert_cmd.run_command
-      #convert_cmd.error!
-
-    end
+  end
 
     #
     #
