@@ -4,7 +4,7 @@ module Onevmcatcher
 
     # Registered image formats and archives
     KNOWN_IMAGE_ARCHIVES = %w(ova tar).freeze
-    KNOWN_IMAGE_FORMATS  = %w(cow dmg parallels qcow qcow2 raw vdi vmdk).freeze
+    KNOWN_IMAGE_FORMATS  = %w(cow dmg parallels qcow qcow2 raw vdi vmdk vhd).freeze
 
     # Archive format string msg
     ARCHIVE_STRING = "POSIX tar archive"
@@ -38,19 +38,14 @@ module Onevmcatcher
 
       if archived?(metadata.dc_identifier.inspect)
         unpacking_dir = unpack_archived!(metadata, vmcatcher_configuration)
-        converter = Onevmcatcher::FormatConverters::UnpackedFormatConverter.new(unpacking_dir,
-                                                                                metadata,
-                                                                                vmcatcher_configuration)
-        file_format = "unpacked"
-        # TODO here, or in UnpackedFormatConverter find out image format of unpacked image and use it
+        file_format = inspect_unpacked_dir(unpacking_dir, metadata)
       else
-        file_format = format?(orig_image_file(metadata, vmchatcher_configuration))
+        file_format = format(orig_image_file(metadata, vmchatcher_configuration))
         unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
-        converter = Onevmcatcher::FormatConverters::SimpleFormatConverter.new(unpacking_dir,
-                                                                              metadata,
-                                                                              vmcatcher_configuration)
       end
+      converter = Onevmcatcher::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
       converter.convert!(file_format, required_format)
+
     end
 
     private
@@ -58,9 +53,9 @@ module Onevmcatcher
     # Checks the given format against a list of available
     # image formats.
     #
-    # @param unpacking_dir [String] name of the directory with unpacked image files
+    # @param unpacking_dir [String] name and path of the checked file
     # @return [String] image format
-    def format?(file)  
+    def format(file)  
       image_format_tester = Mixlib::ShellOut.new("qemu-img info #{file}")
       image_format_tester.run_command
       if image_format_tester.error?
@@ -94,6 +89,29 @@ module Onevmcatcher
 
       unpacking_dir
     end
+
+    #
+    #
+    # @param directory [String] name of directory where '.ova' or '.tar' is unpacked
+    # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
+    # @return [String] format of image or nil.
+    def inspect_unpacked_dir(directory, metadata)
+      dir = Dir.new "directory"
+      counter = 0
+      files = dir["*"]
+      files each do |file|
+        file_format = format("#{directory}/#{file}")
+        if KNOWN_IMAGE_FORMATS.include? file_format
+          counter+1
+          # unsupported ova content (more than one disk)
+          return nil if counter > 1
+          File.new("#{directory}/#{file}","r").rename(file, "#{metadata.dc_identifier}.#{file_format}")
+        end
+      end
+        return nil if counter = 0
+
+        file_format
+      end
 
     #
     #
