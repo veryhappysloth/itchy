@@ -18,6 +18,7 @@ module Onevmcatcher
                              "#{metadata.dc_identifier.inspect} from " \
                              "original format: #{file_format} to " \
                              "required format: #{required_format}."
+      
       convert_cmd = Mixlub::Shellout.new("qemu-img convert",
                                        "-f #{original_format} " \
                                        "-O #{required_format} " \

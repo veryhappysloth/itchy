@@ -4,6 +4,7 @@ defaults: &defaults
   endpoint: http://localhost:2633/RPC2
   metadata_dir: /var/spool/onevmcatcher
   template_dir:
+  output_dir:
   auth: none
   username:
   password:

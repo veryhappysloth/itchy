@@ -43,9 +43,9 @@ module Onevmcatcher
         file_format = format(orig_image_file(metadata, vmchatcher_configuration))
         unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
       end
+      required_format = "qcow2"
       converter = Onevmcatcher::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
       converter.convert!(file_format, required_format)
-
     end
 
     private
@@ -108,7 +108,7 @@ module Onevmcatcher
           File.new("#{directory}/#{file}","r").rename(file, "#{metadata.dc_identifier}.#{file_format}")
         end
       end
-        return nil if counter = 0
+        return nil if counter == 0
 
         file_format
       end

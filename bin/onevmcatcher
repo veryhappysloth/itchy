@@ -32,6 +32,16 @@ class OnevmcatcherRunnable < Thor
   AVAILABLE_LOG_LEVELS   = ['debug', 'info', 'warn', 'error', 'fatal', 'unknown'].freeze
   AVAILABLE_AUTH_METHODS = ['none', 'basic'].freeze
 
+  shared_option_log_to = [:log_to, {:type => :string, :default => Onevmcatcher::Settings.log_to,
+		    	  :aliases => '-l', :desc => 'Logging output, file path or stderr/stdout'}]
+
+  shared_option_log_level = [:log_level, {:enum => AVAILABLE_LOG_LEVELS,
+                             :default => Onevmcatcher::Settings.log_level,
+                	     :aliases => '-b', :desc => 'Logging level'}]
+
+  shared_option_debug = [:debug, {:type => :boolean, :default => Onevmcatcher::Settings.debug,
+                	 :aliases => '-d', :desc => 'Enable debugging'}]
+
   # Static method required by Thor to make certain
   # actions work.
   def self.source_root
@@ -41,12 +51,10 @@ class OnevmcatcherRunnable < Thor
   desc 'archive', 'Handle an incoming vmcatcher event and store it for further processing'
   method_option :metadata_dir, :type => :string, :default => Onevmcatcher::Settings.metadata_dir,
                 :aliases => '-m', :desc => 'Path to a metadata directory for storing events, must be writable'
-  method_option :log_to, :type => :string, :default => Onevmcatcher::Settings.log_to,
-                :aliases => '-l', :desc => 'Logging output, file path or stderr/stdout'
-  method_option :log_level, :enum => AVAILABLE_LOG_LEVELS, :default => Onevmcatcher::Settings.log_level,
-                :aliases => '-b', :desc => 'Logging level'
-  method_option :debug, :type => :boolean, :default => Onevmcatcher::Settings.debug,
-                :aliases => '-d', :desc => 'Enable debugging'
+  method_option *shared_option_log_to
+  method_option *shared_option_log_level
+  method_option *shared_option_debug
+
   def archive
     check_restrictions
     opts = normalize_options
@@ -59,6 +67,19 @@ class OnevmcatcherRunnable < Thor
       Onevmcatcher::VmcatcherConfiguration.new(ENV),
       opts
     ).archive!(Onevmcatcher::VmcatcherEvent.new(ENV))
+  end
+
+  desc 'process', 'Process stored events'
+  method_option :required_format, :type => :string, :default => Onevmcatcher::Settings.output_image_formats,
+		:aliases => '-f', :desc => 'Required output format of converted images'
+  method_option :output_dir, :type => :string, :default => Onevmcatcher::Settings.metadata_dir,
+		:aliases => '-o', :desc => 'Path to a directory where processed events descriptors will be stored'
+  method_option *shared_option_log_to
+  method_option *shared_option_log_level
+  method_option *shared_option_debug
+
+  def process
+    puts "Not implemented yet!"
   end
 
   private
