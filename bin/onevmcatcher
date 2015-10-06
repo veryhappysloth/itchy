@@ -79,7 +79,14 @@ class OnevmcatcherRunnable < Thor
   method_option *shared_option_debug
 
   def process
-    puts "Not implemented yet!"
+    check_restrictions
+    opts = normalize_options
+    logger = init_logger(opts)
+
+    Onevmcatcher::Log.info "[#{self.class.name}] Processing started"
+    Onevmcatcher::Log.debug "[#{self.class.name}] With options: #{opts.inspect}"
+
+    #TODO call instance of handler
   end
 
   private
