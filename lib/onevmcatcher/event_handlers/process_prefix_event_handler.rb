@@ -4,7 +4,8 @@ module Onevmcatcher::EventHandlers
 
     def handle!(vmcatcher_event)
       super
-      Onevmcatcher::Log.warn "[#{self.class.name}] Just ignoring #{vmcatcher_event.type.inspect}"
+      Onevmcatcher::Log.info "[#{self.class.name}] Handling #{vmcatcher_event.type.inspect}" \
+        "This kind of event is just logged, nothing to process."
     end
 
   end

@@ -43,6 +43,7 @@ module Onevmcatcher
         file_format = format(orig_image_file(metadata, vmchatcher_configuration))
         unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
       end
+      #TODO take required_format from options
       required_format = "qcow2"
       converter = Onevmcatcher::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
       converter.convert!(file_format, required_format)
@@ -95,7 +96,7 @@ module Onevmcatcher
     # @param directory [String] name of directory where '.ova' or '.tar' is unpacked
     # @param metadata [Onevmcatcher::VmcatcherEvent] event metadata
     # @return [String] format of image or nil.
-    def inspect_unpacked_dir(directory, metadata)
+    def inspect_unpacked_dir(directory, metadata, identifier)
       dir = Dir.new "directory"
       counter = 0
       files = dir["*"]
@@ -178,6 +179,28 @@ module Onevmcatcher
       end
       temp = image_format_tester.stdout
       temp.include? ARCHIVE_STRING
+    end
+
+    def create_descriptor()
+      os = Cloud::Appliance::Descriptor::Os.new(:distribution => metadata.sl_osversion
+                                                :version => metadata.sl_osversion
+                                                :arch => metadata.sl_arch
+                                                :type => metadata.sl_os)
+      disk = Cloud::Appliance::Descriptor::Os.new(:type => "??"
+                                                  :format => options.required_format
+                                                  :path => vmcatcher_configuration.dir
+                                                 )
+      appliance = Cloud::Appliance::Descriptor::Appliance.new()
+      appliance.action = "TODO"
+      appliance.title = metadata.dc_title
+      appliance.description = metadata.dc_description
+      appliance.version = metadata.hv_version
+      appliance.indentifier = metadata.dc_identifier
+      appliance.vo = metadata.vo
+
+      appliance.meta_attributes = "TODO"
+
+      appliance.to_json
     end
   
   end

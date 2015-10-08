@@ -7,16 +7,8 @@ module Onevmcatcher::EventHandlers
       Onevmcatcher::Log.info "[#{self.class.name}] Handling updated image " \
                              "for #{vmcatcher_event.dc_identifier.inspect}"
 
-      image_directory = image_transformer_instance.transform!(
-        vmcatcher_event,
-        vmcatcher_configuration
-      )
-
-      datastore_instance.register_image!(
-        image_directory,
-        vmcatcher_event,
-        vmcatcher_configuration
-      )
+      image_transformer_instance = Onevmcatcher::ImageTransformer.new()
+      image_transformer_instance.transform!(vmcatcher_event,vmcatcher_configuration)
     end
 
   end

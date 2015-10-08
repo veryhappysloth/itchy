@@ -86,7 +86,7 @@ class OnevmcatcherRunnable < Thor
     Onevmcatcher::Log.info "[#{self.class.name}] Processing started"
     Onevmcatcher::Log.debug "[#{self.class.name}] With options: #{opts.inspect}"
 
-    #TODO call instance of handler
+    Onevmcatcher::EventProcesser.new(Onevmcatcher::Configuration.new(ENV), opts).process!
   end
 
   private

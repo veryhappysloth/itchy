@@ -50,18 +50,17 @@ module Onevmcatcher::EventHandlers
       true
     end
 
-    # Triggers a handling procedure on the registered event.
+    # Triggers a handling procedure on the stored events.
     #
-    # @param vmcatcher_event [Onevmcatcher::VmcatcherEvent] event being handled
-    def handle!(vmcatcher_event)
-      unless vmcatcher_event.kind_of?(Onevmcatcher::VmcatcherEvent)
-        fail ArgumentError, '\'vmcatcher_event\' must be an instance of ' \
-                            'Onevmcatcher::VmcatcherEvent!'
-      end
+    # @param events_dir [String] path to directory with stored events
+    def handle!(events_dir)
 
-      Onevmcatcher::Log.info "[#{self.class.name}] Processing event " \
-                             "#{vmcatcher_event.type.inspect} for " \
-                             "#{vmcatcher_event.dc_identifier.inspect}"
+      Onevmcatcher::Log.info "[#{self.class.name}] Processing stored events."
+      dir = Dir.new "events_dir"
+      events = dir["*"]
+      events each do |event|
+        Onevmcatcher::VmcatcherEvent.new()
+
     end
 
     protected
