@@ -27,8 +27,22 @@ module Onevmcatcher
       end
     end
 
-    def archived_events
+    def archived_events(&block)
+        arch_events = ::Dir.glob(::File.join(options.metadata_dir, '*.json'))
+        arch_events.sort!
 
+        Onevmcatcher::Log.debug "[#{self.class.name}] Foud events: #{arch_events.inspect}"
+        arch_events.each do |json|
+          json_short = json.split(::File::SEPARATOR).last
+
+          unless Onevmcatcher::EventHandlers::BaseEventHandler::Event_FILE_REGEXP =~ json_short
+            Onevmcatcher::Log.error "[#{self.class.name}] #{json.inspect} doesn't match the required format"
+            next
+          end
+
+          vmc_event_from_json = read_event(json)
+          block.call(json, vmc_event_from_json) if vmc_event_from_json
+        end
     end
 
     def read_event(json)

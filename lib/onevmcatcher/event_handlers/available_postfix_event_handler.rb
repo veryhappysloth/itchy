@@ -8,16 +8,17 @@ module Onevmcatcher::EventHandlers
                              "for #{vmcatcher_event.dc_identifier.inspect}"
 
       create_descriptor(vmcatcher_event)
-      image_transformer_instance = Onevmcatcher::ImageTransformer.new()
+      image_transformer_instance = Onevmcatcher::ImageTransformer.new(@options)
       image_transformer_instance.transform!(vmcatcher_event,vmcatcher_configuration)
     end
 
+private
     # Create appliance descriptor from VMCATCHER_EVENT metadata.
     def create_descriptor(metadata)
       os = Cloud::Appliance::Descriptor::Os.new(:distribution => metadata.sl_osversion,
                                                 :version => metadata.sl_osversion)
       disk = Cloud::Appliance::Descriptor::Disk.new(:type => :os,
-                                                    :format => options.required_format)
+                                                    :format => @options.required_format)
 
       appliance = Cloud::Appliance::Descriptor::Appliance.new :action => create
       appliance.title = metadata.dc_title
