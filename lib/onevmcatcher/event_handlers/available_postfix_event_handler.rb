@@ -15,12 +15,12 @@ module Onevmcatcher::EventHandlers
 private
     # Create appliance descriptor from VMCATCHER_EVENT metadata.
     def create_descriptor(metadata)
-      os = Cloud::Appliance::Descriptor::Os.new(:distribution => metadata.sl_osversion,
+      os = ::Cloud::Appliance::Descriptor::Os.new(:distribution => metadata.sl_osversion,
                                                 :version => metadata.sl_osversion)
-      disk = Cloud::Appliance::Descriptor::Disk.new(:type => :os,
+      disk = ::Cloud::Appliance::Descriptor::Disk.new(:type => :os,
                                                     :format => @options.required_format)
 
-      appliance = Cloud::Appliance::Descriptor::Appliance.new :action => create
+      appliance = ::Cloud::Appliance::Descriptor::Appliance.new :action => :create
       appliance.title = metadata.dc_title
       appliance.version = metadata.hv_version
       appliance.os = os

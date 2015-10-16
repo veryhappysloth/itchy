@@ -50,6 +50,13 @@ module Onevmcatcher::EventHandlers
       true
     end
 
+    def handle!(vmcatcher_event)
+	unless vmcatcher_event.kind_of?(Onevmcatcher::VmcatcherEvent)
+	  fail ArgumentError, '\'vmcatcher_event\' must be an instance of ' \
+			      'Onevmcatcher::VmcatcherEvent!'
+        end
+    end
+
     protected
 
     # Creates an image transformer instance with options.

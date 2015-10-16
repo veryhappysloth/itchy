@@ -22,7 +22,7 @@ module Onevmcatcher
           event_handler = event_handler.new(vmc_configuration, options)
           event_handler.handle!(event)
 
-          clean_up_event!(event, event_file)
+          clean_event!(event, event_file)
         end
       end
     end
@@ -35,13 +35,13 @@ module Onevmcatcher
         arch_events.each do |json|
           json_short = json.split(::File::SEPARATOR).last
 
-          unless Onevmcatcher::EventHandlers::BaseEventHandler::Event_FILE_REGEXP =~ json_short
+          unless Onevmcatcher::EventHandlers::BaseEventHandler::EVENT_FILE_REGEXP =~ json_short
             Onevmcatcher::Log.error "[#{self.class.name}] #{json.inspect} doesn't match the required format"
             next
           end
 
           vmc_event_from_json = read_event(json)
-          block.call(json, vmc_event_from_json) if vmc_event_from_json
+          block.call(vmc_event_from_json, json) if vmc_event_from_json
         end
     end
 
@@ -58,7 +58,7 @@ module Onevmcatcher
       Onevmcatcher::Log.info "[#{self.class.name}] Cleaning up"
 
       begin
-        ::FileUtils.rm_-f event_file
+        ::FileUtils.rm_f event_file
       rescue => ex
         Onevmcatcher::Log.fatal "Failed to clean up event"
       end
