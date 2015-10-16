@@ -50,19 +50,6 @@ module Onevmcatcher::EventHandlers
       true
     end
 
-    # Triggers a handling procedure on the stored events.
-    #
-    # @param events_dir [String] path to directory with stored events
-    def handle!(events_dir)
-
-      Onevmcatcher::Log.info "[#{self.class.name}] Processing stored events."
-      dir = Dir.new "events_dir"
-      events = dir["*"]
-      events each do |event|
-        Onevmcatcher::VmcatcherEvent.new()
-
-    end
-
     protected
 
     # Creates an image transformer instance with options.

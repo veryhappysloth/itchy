@@ -137,7 +137,6 @@ class OnevmcatcherRunnable < Thor
     logger.level = opts.log_level
     logger
   end
-
 end
 
 OnevmcatcherRunnable.start
