@@ -180,12 +180,12 @@ module Onevmcatcher
     end
 
     def create_descriptor()
-      os = Cloud::Appliance::Descriptor::Os.new(:distribution => metadata.sl_osversion
-                                                :version => metadata.sl_osversion
-                                                :arch => metadata.sl_arch
+      os = Cloud::Appliance::Descriptor::Os.new(:distribution => metadata.sl_osversion,
+                                                :version => metadata.sl_osversion,
+                                                :arch => metadata.sl_arch,
                                                 :type => metadata.sl_os)
-      disk = Cloud::Appliance::Descriptor::Os.new(:type => "??"
-                                                  :format => options.required_format
+      disk = Cloud::Appliance::Descriptor::Os.new(:type => "??",
+                                                  :format => options.required_format,
                                                   :path => vmcatcher_configuration.dir
                                                  )
       appliance = Cloud::Appliance::Descriptor::Appliance.new()

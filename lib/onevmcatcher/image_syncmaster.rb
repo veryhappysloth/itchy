@@ -104,7 +104,7 @@ module Onevmcatcher
       begin
         ::FileUtils.rm_f event_file
       rescue => ex
-     def archived_events()        Onevmcatcher::Log.fatal "[#{self.class.name}] Failed to clean up event " \
+      Onevmcatcher::Log.fatal "[#{self.class.name}] Failed to clean up event " \
                                 "#{event.type.inspect} from #{event_file.inspect}: " \
                                 "#{ex.message}"
       end
