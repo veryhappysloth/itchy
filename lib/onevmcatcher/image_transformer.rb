@@ -10,7 +10,7 @@ module Onevmcatcher
     ARCHIVE_STRING = "POSIX tar archive"
 
     # REGEX pattern for getting image format
-    FORMAT_PATTERN = "/format:\s(.*?)$/"
+    FORMAT_PATTERN = /format:\s(.*?)$/
 
     # Creates a class instance.
     #
@@ -22,7 +22,7 @@ module Onevmcatcher
       fail "Unsupported input image format enabled in configuration! " \
            "#{@inputs.inspect}" unless (@options.input_image_formats - @inputs).empty?
       fail "Unsupported output image format enabled in configuration! " \
-           "#{KNOWN_IMAGE_FORMATS.inspect}" unless (@options.output_image_formats - KNOWN_IMAGE_FORMATS).empty?
+           "#{KNOWN_IMAGE_FORMATS.inspect}" unless (@options.required_format - KNOWN_IMAGE_FORMATS).empty?
     end
 
     # Transforms image(s) associated with the given event to formats
@@ -40,7 +40,7 @@ module Onevmcatcher
         unpacking_dir = unpack_archived!(metadata, vmcatcher_configuration)
         file_format = inspect_unpacked_dir(unpacking_dir, metadata)
       else
-        file_format = format(orig_image_file(metadata, vmchatcher_configuration))
+        file_format = format(orig_image_file(metadata, vmcatcher_configuration))
         unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
       end
       converter = Onevmcatcher::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
@@ -61,12 +61,14 @@ module Onevmcatcher
         Onevmcatcher::Log.error "[#{self.class.name}] Checking file format for" \
                                 "#{file} failed!"
       end
-      format = image_format_tester.stdout.scan(FORMAT_PATTERN)
-      unless KNOWN_IMAGE_FORMATS.include? format
-        fail "Image format #{format}" \
-             "is unknown and not supported!"
+      file_format = image_format_tester.stdout.scan(FORMAT_PATTERN)[0].flatten.first
+      puts file_format
+      puts KNOWN_IMAGE_FORMATS
+      unless KNOWN_IMAGE_FORMATS.include? file_format
+        fail "Image format #{file_format}" \
+             " is unknown and not supported!"
       end
-      format
+      file_format
     end
 
     #
@@ -152,7 +154,7 @@ module Onevmcatcher
     # @param vmcatcher_configuration [Onevmcatcher::VmcatcherConfiguration] current VMC configuration
     # @return [String] path to the newly created image directory
     def prepare_image_temp_dir(metadata, vmcatcher_configuration)
-      temp_dir = "#{vmcatcher_configuration.cache_dir_cache}/#{metadata.dc_identifier}"
+      temp_dir = "#{vmcatcher_configuration.cache_dir_cache}/temp/#{metadata.dc_identifier}"
 
       begin
         ::FileUtils.mkdir_p temp_dir
@@ -177,28 +179,6 @@ module Onevmcatcher
       end
       temp = image_format_tester.stdout
       temp.include? ARCHIVE_STRING
-    end
-
-    def create_descriptor()
-      os = Cloud::Appliance::Descriptor::Os.new(:distribution => metadata.sl_osversion,
-                                                :version => metadata.sl_osversion,
-                                                :arch => metadata.sl_arch,
-                                                :type => metadata.sl_os)
-      disk = Cloud::Appliance::Descriptor::Os.new(:type => "??",
-                                                  :format => options.required_format,
-                                                  :path => vmcatcher_configuration.dir
-                                                 )
-      appliance = Cloud::Appliance::Descriptor::Appliance.new()
-      appliance.action = "TODO"
-      appliance.title = metadata.dc_title
-      appliance.description = metadata.dc_description
-      appliance.version = metadata.hv_version
-      appliance.indentifier = metadata.dc_identifier
-      appliance.vo = metadata.vo
-
-      appliance.meta_attributes = "TODO"
-
-      appliance.to_json
     end
   
   end
