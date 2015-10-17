@@ -17,7 +17,8 @@ private
       os = ::Cloud::Appliance::Descriptor::Os.new(:distribution => metadata.sl_osversion,
                                                 :version => metadata.sl_osversion)
       disk = ::Cloud::Appliance::Descriptor::Disk.new(:type => :os,
-                                                    :format => @options.required_format)
+                                                      :format => @options.required_format,
+						      :path => "#{@options.output_dir}/#{metadata.dc_identifier}")
 
       appliance = ::Cloud::Appliance::Descriptor::Appliance.new :action => :create
       appliance.title = metadata.dc_title

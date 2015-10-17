@@ -13,20 +13,14 @@ module Onevmcatcher
       @vmcatcher_configuration = vmcatcher_configuration
     end
 
-    def convert!(file_format, required_format)
+    def convert!(file_format, required_format, output_dir)
       Onevmcatcher::Log.info "[#{self.class.name}] Converting image " \
                              "#{@metadata.dc_identifier.inspect} from " \
                              "original format: #{file_format} to " \
                              "required format: #{required_format}."
 
-      convert_cmd = Mixlib::ShellOut.new("qemu-img convert" \
-                                       "-f #{file_format} " \
-                                       "-O #{required_format} " \
-                                       "#{@unpacking_dir}/#{@metadata.dc_identifier} " \
-                                       "#{@unpacking_dir}/converted/" \
-                                       "#{@metadata.dc_identifier}")
+      convert_cmd = Mixlib::ShellOut.new("qemu-img convert -f #{file_format} -O #{required_format} #{@unpacking_dir}/#{@metadata.dc_identifier} #{output_dir}/#{@metadata.dc_identifier}")
       convert_cmd.run_command
-      puts "CONVERTED"
     end
 
   end

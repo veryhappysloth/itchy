@@ -47,7 +47,7 @@ module Onevmcatcher
         #TODO just simlink to output_dir
       else
         converter = Onevmcatcher::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
-        converter.convert!(file_format, @options.required_format)
+        converter.convert!(file_format, @options.required_format, @options.output_dir)
       end
     end
 
