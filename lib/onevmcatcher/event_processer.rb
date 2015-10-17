@@ -20,9 +20,9 @@ module Onevmcatcher
         begin
           event_handler = Onevmcatcher::EventHandlers.const_get("#{event.type}EventHandler")
           event_handler = event_handler.new(vmc_configuration, options)
-          event_handler.handle!(event)
+          event_handler.handle!(event, event_file)
 
-          clean_event!(event, event_file)
+        #  clean_event!(event, event_file)
         end
       end
     end
@@ -30,7 +30,6 @@ module Onevmcatcher
     def archived_events(&block)
         arch_events = ::Dir.glob(::File.join(options.metadata_dir, '*.json'))
         arch_events.sort!
-
         Onevmcatcher::Log.debug "[#{self.class.name}] Foud events: #{arch_events.inspect}"
         arch_events.each do |json|
           json_short = json.split(::File::SEPARATOR).last

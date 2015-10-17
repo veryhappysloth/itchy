@@ -21,8 +21,8 @@ module Onevmcatcher
 
       fail "Unsupported input image format enabled in configuration! " \
            "#{@inputs.inspect}" unless (@options.input_image_formats - @inputs).empty?
-      fail "Unsupported output image format enabled in configuration! " \
-           "#{KNOWN_IMAGE_FORMATS.inspect}" unless (@options.required_format - KNOWN_IMAGE_FORMATS).empty?
+      #fail "Unsupported output image format enabled in configuration! " \
+      #     "#{KNOWN_IMAGE_FORMATS.inspect}" unless (@options.required_format - KNOWN_IMAGE_FORMATS).empty?
     end
 
     # Transforms image(s) associated with the given event to formats

@@ -58,7 +58,8 @@ module Onevmcatcher::EventHandlers
     end
 
     def save_descriptor(descriptor, name)
-      File.open("#{@options.descriptor_dir}/#{name}.descriptor", 'w') {|f| f.write(descriptor)}
+      name.slice! @options.metadata_dir
+      File.open("#{@options.descriptor_dir}#{name}", 'w') {|f| f.write(descriptor)}
     end
 
     protected

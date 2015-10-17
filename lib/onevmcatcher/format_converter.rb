@@ -21,7 +21,7 @@ module Onevmcatcher
 
       convert_cmd = Mixlib::ShellOut.new("qemu-img convert" \
                                        "-f #{file_format} " \
-                                       "-O #{required_format.flatten.first} " \
+                                       "-O #{required_format} " \
                                        "#{@unpacking_dir}/#{@metadata.dc_identifier} " \
                                        "#{@unpacking_dir}/converted/" \
                                        "#{@metadata.dc_identifier}")
