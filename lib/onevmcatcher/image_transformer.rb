@@ -43,8 +43,12 @@ module Onevmcatcher
         file_format = format(orig_image_file(metadata, vmcatcher_configuration))
         unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
       end
-      converter = Onevmcatcher::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
-      converter.convert!(file_format, @options.required_format)
+      if file_format == @options.required_format
+        #TODO just simlink to output_dir
+      else
+        converter = Onevmcatcher::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
+        converter.convert!(file_format, @options.required_format)
+      end
     end
 
     private

@@ -19,8 +19,7 @@ defaults: &defaults
   input_image_formats:
   - raw
   - ova
-  output_image_formats:
-  - qcow2
+  output_image_format: qcow2
   qemu_img_binary: /usr/bin/qemu-img
 
 ###############################################

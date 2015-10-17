@@ -72,7 +72,7 @@ class OnevmcatcherRunnable < Thor
   desc 'process', 'Process stored events'
   method_option :metadata_dir, :type => :string, :default => Onevmcatcher::Settings.metadata_dir,
                 :aliases => '-m', :desc => 'Path to a metadata directory for stored events'
-  method_option :required_format, :type => :string, :default => Onevmcatcher::Settings.output_image_formats,
+  method_option :required_format, :type => :string, :default => Onevmcatcher::Settings.output_image_format,
 		:aliases => '-f', :desc => 'Required output format of converted images'
   method_option :output_dir, :type => :string, :default => Onevmcatcher::Settings.metadata_dir,
 		:aliases => '-o', :desc => 'Path to a directory where processed events descriptors will be stored'
