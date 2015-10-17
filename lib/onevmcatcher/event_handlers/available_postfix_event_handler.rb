@@ -2,12 +2,12 @@ module Onevmcatcher::EventHandlers
   # Handler for AvailablePostfix event (image available).
   class AvailablePostfixEventHandler < BaseEventHandler
 
-    def handle!(vmcatcher_event)
+    def handle!(vmcatcher_event, event_file)
       super
       Onevmcatcher::Log.info "[#{self.class.name}] Handling updated image " \
                              "for #{vmcatcher_event.dc_identifier.inspect}"
 
-      create_descriptor(vmcatcher_event)
+      save_descriptor(create_descriptor(vmcatcher_event), event_file)
       image_transformer_instance = Onevmcatcher::ImageTransformer.new(@options)
       image_transformer_instance.transform!(vmcatcher_event,vmcatcher_configuration)
     end
@@ -31,6 +31,4 @@ private
 
       descriptor = appliance.to_json
     end
-
-  end
 end

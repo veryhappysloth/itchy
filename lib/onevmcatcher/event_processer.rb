@@ -64,5 +64,15 @@ module Onevmcatcher
       end
     end
 
+
+    def check_descriptor_dir
+      Onevmcatcher::Log.debug "[#{self.class.name}] Checking root descriptor dir #{options.descriptor_dir.inspect}"
+      fail ArgumentError, 'Root descriptor directory' \
+                          'is not a directory!' unless File.directory? options.descriptor_dir
+      fail ArgumentError, 'Root descriptor directory' \
+        'is not readable!' unless File.readable? opitons.descriptor_dir
+    end
+
+
   end
 end

@@ -50,11 +50,15 @@ module Onevmcatcher::EventHandlers
       true
     end
 
-    def handle!(vmcatcher_event)
+    def handle!(vmcatcher_event, event_file)
 	unless vmcatcher_event.kind_of?(Onevmcatcher::VmcatcherEvent)
 	  fail ArgumentError, '\'vmcatcher_event\' must be an instance of ' \
 			      'Onevmcatcher::VmcatcherEvent!'
         end
+    end
+
+    def save_descriptor(descriptor, name)
+      File.open("#{@options.descriptor_dir}/#{name}.descriptor", 'w') {|f| f.write(descriptor)}
     end
 
     protected

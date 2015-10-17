@@ -5,6 +5,7 @@ defaults: &defaults
   metadata_dir: /var/spool/onevmcatcher
   template_dir:
   output_dir:
+  descriptor_dir: /tmp/vmcatcher/descriptors
   auth: none
   username:
   password:
