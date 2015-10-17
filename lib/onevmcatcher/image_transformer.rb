@@ -62,8 +62,6 @@ module Onevmcatcher
                                 "#{file} failed!"
       end
       file_format = image_format_tester.stdout.scan(FORMAT_PATTERN)[0].flatten.first
-      puts file_format
-      puts KNOWN_IMAGE_FORMATS
       unless KNOWN_IMAGE_FORMATS.include? file_format
         fail "Image format #{file_format}" \
              " is unknown and not supported!"
@@ -122,8 +120,7 @@ module Onevmcatcher
     def copy_unpacked!(metadata, vmcatcher_configuration)
       Onevmcatcher::Log.info "[#{self.class.name}] Copying image " \
                              "for #{metadata.dc_identifier.inspect}"
-      unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration)
-
+      unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration).flatten.first
       begin
         ::FileUtils.ln_sf(
           orig_image_file(metadata, vmcatcher_configuration),

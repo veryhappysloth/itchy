@@ -14,7 +14,7 @@ module Onevmcatcher
     end
 
     def process!
-      Onevmcatcher::Log.info "[#{self.class.name}] Processing eventes stored in "
+      Onevmcatcher::Log.info "[#{self.class.name}] Processing eventes stored in #{options.metadata_dir}"
     
       archived_events do |event, event_file|
         begin
