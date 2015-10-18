@@ -1,0 +1,32 @@
+---
+defaults: &defaults
+  metadata_dir: /var/spool/onevmcatcher
+  template_dir:
+  output_dir:
+  descriptor_dir: /tmp/vmcatcher/descriptors
+  log_to: stderr
+  log_level: error
+  ca_path: /etc/grid-security/certificates
+  ca_file:
+  debug: false
+  skip_ca_check: false
+  input_image_formats:
+  - raw
+  - ova
+  output_image_format: qcow2
+  qemu_img_binary: /usr/bin/qemu-img
+
+###############################################
+#######  DO NOT EDIT AFTER THIS POINT  ########
+###############################################
+
+production:
+  <<: *defaults
+
+development:
+  <<: *defaults
+  log_level: debug
+
+test:
+  <<: *defaults
+  log_level: debug

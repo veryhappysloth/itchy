@@ -8,4 +8,4 @@ if ENV['COVERAGE']
   SimpleCov.start
 end
 
-require 'onevmcatcher'
+require 'itchy'
