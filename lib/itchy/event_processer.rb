@@ -22,7 +22,7 @@ module Itchy
           event_handler = event_handler.new(vmc_configuration, options)
           event_handler.handle!(event, event_file)
 
-        #  clean_event!(event, event_file)
+          clean_event!(event, event_file)
         end
       end
     end
