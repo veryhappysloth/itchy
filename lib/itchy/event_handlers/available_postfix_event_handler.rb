@@ -20,7 +20,7 @@ private
                                                       :format => @options.required_format,
 						      :path => "#{@options.output_dir}/#{metadata.dc_identifier}")
 
-      appliance = ::Cloud::Appliance::Descriptor::Appliance.new :action => :create
+      appliance = ::Cloud::Appliance::Descriptor::Appliance.new :action => :registration
       appliance.title = metadata.dc_title
       appliance.version = metadata.hv_version
       appliance.os = os

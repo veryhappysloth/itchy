@@ -62,7 +62,7 @@ module Itchy::EventHandlers
       dir_name = name
       dir_name.slice! ".json"
       ::FileUtils.mkdir_p "#{@options.descriptor_dir}/#{dir_name}"
-      File.open("#{@options.descriptor_dir}#{dir_name}/#{name}", 'w') {|f| f.write(descriptor)}
+      File.open("#{@options.descriptor_dir}#{dir_name}/#{name}.json", 'w') {|f| f.write(descriptor)}
     end
 
     protected
