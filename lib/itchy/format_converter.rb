@@ -1,7 +1,12 @@
 module Itchy
-
+  # Converting different image formats
   class FormatConverter
 
+    # Creates and converter instance for converting image to requried format
+    # 
+    # @param unpacking_di [String] path to directory where image is stored
+    # @param metadata [VmcatcherEvent] metadata of event corresponding to image
+    # @param vmcatcher_configuration [VmcatcherConfiguration] vmcatcher configuration
     def initialize(unpacking_dir, metadata, vmcatcher_configuration)
       unless vmcatcher_configuration.kind_of?(Itchy::VmcatcherConfiguration)
         fail ArgumentError, '\'vmcatcher_configuration\' must be an instance of ' \
@@ -13,6 +18,11 @@ module Itchy
       @vmcatcher_configuration = vmcatcher_configuration
     end
 
+    # Converts image to required format. It uses Mixlib::ShelOut.
+    #
+    # @param file_format [String] actual format of the image
+    # @param required_format [String] required format
+    # @param output_dir [String] path to a directory where converted image should be stored
     def convert!(file_format, required_format, output_dir)
       Itchy::Log.info "[#{self.class.name}] Converting image " \
                              "#{@metadata.dc_identifier.inspect} from " \

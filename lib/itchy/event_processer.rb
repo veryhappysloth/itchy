@@ -1,9 +1,13 @@
 module Itchy
-
+  # Process stored evenets.
   class EventProcesser
 
     attr_reader :vmc_configuration, :options
 
+    # Creates and processer instance for stored vmcatcher events.
+    #
+    # @param vmc_configuration [Itchy::Vmcatcher::Configuration] vmcatcher configuration
+    # @param options [Hashie::Mash] hask-like structure with options
     def initialize(vmc_configuration, options)
       fail ArgumentError, '"vmc_configuration" must be an instance ' \
         'of Itchy::VmcatcherConfiguration' unless vmc_configuration.kind_of? Itchy::VmcatcherConfiguration
@@ -13,6 +17,9 @@ module Itchy
 
     end
 
+    # Processing method for events. For each event calls respective
+    # event handler. And after processing of each event, stored event
+    # file is deleted.
     def process!
       Itchy::Log.info "[#{self.class.name}] Processing eventes stored in #{options.metadata_dir}"
     
@@ -44,6 +51,12 @@ module Itchy
         end
     end
 
+    # Creates VmcatcherEvent instance.
+    #
+    # @param json json [String] path to file containing json representation
+    # of vmcatcher event
+    #
+    # @return [VmcatcherEvent] instance representing event
     def read_event(json)
       begin
         Itchy::VmcatcherEvent.new(::File.read(json))
@@ -53,6 +66,10 @@ module Itchy
       end
     end
 
+    # Deletes event file.
+    #
+    # @param event [VmcatcherEvent] event for cleaning
+    # @param event_file [String] path to file containing event info
     def clean_event!(event, event_file)
       Itchy::Log.info "[#{self.class.name}] Cleaning up"
 
@@ -63,7 +80,7 @@ module Itchy
       end
     end
 
-
+    # Checks if description directory exists and its readable.
     def check_descriptor_dir
       Itchy::Log.debug "[#{self.class.name}] Checking root descriptor dir #{options.descriptor_dir.inspect}"
       fail ArgumentError, 'Root descriptor directory' \

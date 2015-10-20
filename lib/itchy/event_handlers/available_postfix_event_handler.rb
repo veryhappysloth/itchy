@@ -2,6 +2,10 @@ module Itchy::EventHandlers
   # Handler for AvailablePostfix event (image available).
   class AvailablePostfixEventHandler < BaseEventHandler
 
+    # Handles an AvailablePostfix event.
+    #
+    # @param vmcatcher_event [Itchy::VmcatcherEvent] vmcatcher event to handle
+    # @param event_name [String] name of the event
     def handle!(vmcatcher_event, event_name)
       super
       Itchy::Log.info "[#{self.class.name}] Handling updated image " \
@@ -10,9 +14,12 @@ module Itchy::EventHandlers
       image_transformer_instance = Itchy::ImageTransformer.new(@options)
       image_transformer_instance.transform!(vmcatcher_event,vmcatcher_configuration)
     end
-
-private
+    
+    private
     # Create appliance descriptor from VMCATCHER_EVENT metadata.
+    #
+    # @param metadata [Itchy::VmcatcherEvent] vmcatcher event to get metadata from
+    # @return [String] json form of created descriptor
     def create_descriptor(metadata)
       os = ::Cloud::Appliance::Descriptor::Os.new(:distribution => metadata.sl_osversion,
                                                 :version => metadata.sl_osversion)

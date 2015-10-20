@@ -167,7 +167,7 @@ module Itchy
       end
     end
 
-    #
+    # Checks if file is archived image (format ova or tar)
     #
     # @param file [String] inspected file name
     # @return [Boolean] archived or not

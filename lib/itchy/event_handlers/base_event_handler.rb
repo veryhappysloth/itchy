@@ -50,6 +50,7 @@ module Itchy::EventHandlers
       true
     end
 
+    # Handling procedure
     def handle!(vmcatcher_event, event_file)
 	unless vmcatcher_event.kind_of?(Itchy::VmcatcherEvent)
 	  fail ArgumentError, '\'vmcatcher_event\' must be an instance of ' \
@@ -57,6 +58,11 @@ module Itchy::EventHandlers
         end
     end
 
+    # Save created descriptor to descriptor directory. Every descriptor
+    # is stored in its own directory.
+    #
+    # @param descriptor [String] json form of appliance descriptor
+    # @param name [String] name of appliance descriptor (event name)
     def save_descriptor(descriptor, name)
       name.slice! @options.metadata_dir
       dir_name = name
