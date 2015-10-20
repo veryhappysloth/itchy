@@ -93,13 +93,15 @@ module Itchy
       unpacking_dir
     end
 
-    #
+    # Inspect unppacked .ova or .tar files. So far, it checks if there is only one
+    # image file of known format and if it is, it's renamed to dc_identifier end its
+    # format is determined. Otherwise (for now) its unsupported situation.
     #
     # @param directory [String] name of directory where '.ova' or '.tar' is unpacked
     # @param metadata [Itchy::VmcatcherEvent] event metadata
     # @return [String] format of image or nil.
     def inspect_unpacked_dir(directory, metadata, identifier)
-      dir = Dir.new "directory"
+      dir = Dir.new directory
       counter = 0
       files = dir["*"]
       files each do |file|
