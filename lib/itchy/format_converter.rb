@@ -31,6 +31,13 @@ module Itchy
 
       convert_cmd = Mixlib::ShellOut.new("qemu-img convert -f #{file_format} -O #{required_format} #{@unpacking_dir}/#{@metadata.dc_identifier} #{output_dir}/#{@metadata.dc_identifier}")
       convert_cmd.run_command
+      begin
+        convert_cmd.error!
+      rescue => ex
+        Itchy::Log.fatal "[#{self.class.name}] Converting of image failed with " \
+          "error messages #{convert_cmd.stderr}."
+        fail ex
+      end
     end
 
   end
