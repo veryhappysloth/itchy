@@ -37,7 +37,7 @@ module Itchy::EventHandlers
       appliance.identifier = metadata.dc_identifier
       appliance.attributes = metadata.to_hash
 
-      descriptor = appliance.to_json
+      appliance.to_json
     end
   end
 end
