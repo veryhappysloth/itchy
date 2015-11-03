@@ -131,7 +131,7 @@ module Itchy
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a link (copy) " \
           "for #{metadata.dc_identifier.inspect}: " \
           "#{ex.message}"
-        raise ex
+        fail ex
       end
     end
 
@@ -153,7 +153,7 @@ module Itchy
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a link (copy) " \
                                 "for #{metadata.dc_identifier.inspect}: " \
                                 "#{ex.message}"
-        raise ex
+        fail ex
       end
 
       unpacking_dir
@@ -182,7 +182,7 @@ module Itchy
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a directory " \
                                 "for #{metadata.dc_identifier.inspect}: " \
                                 "#{ex.message}"
-        raise ex
+        fail ex
       end
     end
 
