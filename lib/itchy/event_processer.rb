@@ -23,11 +23,23 @@ module Itchy
 
       archived_events do |event, event_file|
         begin
-          event_handler = Itchy::EventHandlers.const_get("#{event.type}EventHandler")
-          event_handler = event_handler.new(vmc_configuration, options)
-          event_handler.handle!(event, event_file)
+          
+          begin
+            event_handler = Itchy::EventHandlers.const_get("#{event.type}EventHandler")
+            event_handler = event_handler.new(vmc_configuration, options)
+            event_handler.handle!(event, event_file)
+          rescue => ex
+            Itchy::Log.error "[#{self.class.name}] Due to error #{ex.message} event #{event_file}" \
+              "was not processed!!! Continuing with next stored event."
+            next
+          end
 
-          clean_event!(event, event_file)
+          begin
+            clean_event!(event, event_file)
+          rescue => ex
+            Itchy::Log.error "[#{self.class.name}] Event #{event_file} was processed, but not cleaned!!!"
+          end
+
         end
       end
     end
