@@ -2,7 +2,6 @@ module Itchy::EventHandlers
   # Basic handler implementing required methods. Can be used
   # as a dummy for testing purposes.
   class BaseEventHandler
-
     TEMPFILE_BASE = 'vmcatcher_event_metadata_archive'
     EVENT_FILE_REGEXP = /^(?<time>\d+)_(?<type>[[:alnum:]]+)_(?<dc_identifier>[[[:alnum:]]-]+)\.json$/
 
@@ -13,7 +12,7 @@ module Itchy::EventHandlers
     # @param vmcatcher_configuration [Itchy::VmcatcherConfiguration] current vmcatcher configuration
     # @param options [Settingslogic] current itchy configuration
     def initialize(vmcatcher_configuration, options)
-      unless vmcatcher_configuration.kind_of?(Itchy::VmcatcherConfiguration)
+      unless vmcatcher_configuration.is_a?(Itchy::VmcatcherConfiguration)
         fail ArgumentError, '\'vmcatcher_configuration\' must be an instance of ' \
                             'Itchy::VmcatcherConfiguration!'
       end
@@ -26,7 +25,7 @@ module Itchy::EventHandlers
     #
     # @param vmcatcher_event [Itchy::VmcatcherEvent] event being archived
     def archive!(vmcatcher_event)
-      unless vmcatcher_event.kind_of?(Itchy::VmcatcherEvent)
+      unless vmcatcher_event.is_a?(Itchy::VmcatcherEvent)
         fail ArgumentError, '\'vmcatcher_event\' must be an instance of ' \
                             'Itchy::VmcatcherEvent!'
       end
@@ -51,11 +50,11 @@ module Itchy::EventHandlers
     end
 
     # Handling procedure
-    def handle!(vmcatcher_event, event_file)
-	unless vmcatcher_event.kind_of?(Itchy::VmcatcherEvent)
-	  fail ArgumentError, '\'vmcatcher_event\' must be an instance of ' \
-			      'Itchy::VmcatcherEvent!'
-        end
+    def handle!(vmcatcher_event, _event_file)
+      unless vmcatcher_event.is_a?(Itchy::VmcatcherEvent)
+        fail ArgumentError, '\'vmcatcher_event\' must be an instance of ' \
+                'Itchy::VmcatcherEvent!'
+            end
     end
 
     # Save created descriptor to descriptor directory. Every descriptor
@@ -66,9 +65,9 @@ module Itchy::EventHandlers
     def save_descriptor(descriptor, name)
       name.slice! @options.metadata_dir
       dir_name = name
-      dir_name.slice! ".json"
+      dir_name.slice! '.json'
       ::FileUtils.mkdir_p "#{@options.descriptor_dir}/#{dir_name}"
-      File.open("#{@options.descriptor_dir}#{dir_name}/#{name}.json", 'w') {|f| f.write(descriptor)}
+      File.open("#{@options.descriptor_dir}#{dir_name}/#{name}.json", 'w') { |f| f.write(descriptor) }
     end
 
     protected
@@ -79,6 +78,5 @@ module Itchy::EventHandlers
     def image_transformer_instance
       @image_transformer_instance_cache ||= Itchy::ImageTransformer.new(options)
     end
-
   end
 end

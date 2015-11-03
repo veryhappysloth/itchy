@@ -9,7 +9,7 @@ module Itchy
   # The first available file will be used. Settings are never
   # merged from multiple files.
   class Settings < Settingslogic
-    HOME_CONF   = File.join(
+    HOME_CONF = File.join(
       ENV['HOME'],
       '.itchy.yml'
     )
@@ -18,7 +18,7 @@ module Itchy
       'itchy',
       'itchy.yml'
     )
-    GEM_CONF    = File.join(
+    GEM_CONF = File.join(
       File.expand_path(File.join('..', '..', '..'), __FILE__),
       'config',
       'itchy.yml'

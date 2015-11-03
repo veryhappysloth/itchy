@@ -3,7 +3,6 @@ module Itchy
   # stored for subsequent processing. There is no actual image
   # handling happening here.
   class MetadataArchiver
-
     attr_reader :vmc_configuration, :options
 
     # Creates an archiver instance for storing vmcatcher
@@ -13,7 +12,7 @@ module Itchy
     # @param options [Hashie::Mash] hash-like structure with options
     def initialize(vmc_configuration, options)
       fail ArgumentError, '"vmc_configuration" must be an instance ' \
-           'of Itchy::VmcatcherConfiguration' unless vmc_configuration.kind_of? Itchy::VmcatcherConfiguration
+           'of Itchy::VmcatcherConfiguration' unless vmc_configuration.is_a? Itchy::VmcatcherConfiguration
 
       @vmc_configuration = vmc_configuration
       @options = options || ::Hashie::Mash.new
@@ -28,7 +27,7 @@ module Itchy
     # @param vmc_event [Itchy::VmcatcherEvent] event to store
     def archive!(vmc_event)
       fail ArgumentError, '"vmc_event" must be an instance ' \
-           'of Itchy::VmcatcherEvent' unless vmc_event.kind_of? Itchy::VmcatcherEvent
+           'of Itchy::VmcatcherEvent' unless vmc_event.is_a? Itchy::VmcatcherEvent
 
       Itchy::Log.info "[#{self.class.name}] Archiving " \
                              "#{vmc_event.type.inspect} " \
@@ -37,8 +36,8 @@ module Itchy
       begin
         event_handler = Itchy::EventHandlers.const_get("#{vmc_event.type}EventHandler")
       rescue NameError => ex
-        fail Itchy::Errors::UnknownEventError,
-             "Unknown event type #{vmc_event.type.inspect} detected: #{ex.message}"
+        raise Itchy::Errors::UnknownEventError,
+              "Unknown event type #{vmc_event.type.inspect} detected: #{ex.message}"
       end
 
       event_handler = event_handler.new(vmc_configuration, options)
@@ -56,6 +55,5 @@ module Itchy
       fail ArgumentError, 'Metadata directory is ' \
                           'not writable!' unless File.writable? options.metadata_dir
     end
-
   end
 end
