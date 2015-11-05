@@ -35,7 +35,7 @@ module Itchy
       rescue => ex
         Itchy::Log.fatal "[#{self.class.name}] Converting of image failed with " \
           "error messages #{convert_cmd.stderr}."
-        fail ex
+        fail Itchy::Errors::FormatConvertingError, ex
       end
     end
   end

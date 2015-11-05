@@ -46,7 +46,11 @@ module Itchy
         copy_same_format(unpacking_dir, metadata)
       else
         converter = Itchy::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
-        converter.convert!(file_format, @options.required_format, @options.output_dir)
+        begin
+          converter.convert!(file_format, @options.required_format, @options.output_dir)
+        rescue Itchy::Errors::FormatConvertingError => ex
+          fail Itchy::Errors::ImageTransformingError, ex
+        end
       end
     end
 
