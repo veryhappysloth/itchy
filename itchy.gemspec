@@ -9,9 +9,9 @@ Gem::Specification.new do |gem|
   gem.version       = Itchy::VERSION
   gem.authors       = ['Lubomir Kosaristan', 'Boris Parak']
   gem.email         = ['436322@mail.muni.cz', 'parak@cesnet.cz']
-  gem.description   = 'Handler integrating OpenNebula with vmcatcher (HEPIX)'
-  gem.summary       = 'OpenNebula handler for vmcatcher'
-  gem.homepage      = 'https://github.com/arax/onevmcatcher'
+  gem.description   = 'Handler integrating nifty with vmcatcher (HEPIX)'
+  gem.summary       = 'Event handler for vmcatcher'
+  gem.homepage      = 'https://github.com/kosoburak/itchy'
   gem.license       = 'Apache License, Version 2.0'
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
