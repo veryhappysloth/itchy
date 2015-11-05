@@ -3,7 +3,7 @@ module Itchy
   class FormatConverter
     # Creates and converter instance for converting image to requried format
     #
-    # @param unpacking_di [String] path to directory where image is stored
+    # @param unpacking_dir [String] path to directory where image is stored
     # @param metadata [VmcatcherEvent] metadata of event corresponding to image
     # @param vmcatcher_configuration [VmcatcherConfiguration] vmcatcher configuration
     def initialize(unpacking_dir, metadata, vmcatcher_configuration)
