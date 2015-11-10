@@ -118,7 +118,7 @@ module Itchy
       files each do |file|
         file_format = format("#{directory}/#{file}")
         if KNOWN_IMAGE_FORMATS.include? file_format
-          counter + 1
+          counter += 1
           # unsupported ova content (more than one disk)
           return nil if counter > 1
           File.new("#{directory}/#{file}", 'r').rename(file, "#{metadata.dc_identifier}.#{file_format}")
