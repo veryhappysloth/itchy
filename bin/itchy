@@ -116,12 +116,6 @@ class ItchyRunnable < Thor
     opts.log_level = Itchy::Log.const_get(options[:log_level].upcase)
     opts.log_level = Itchy::Log::DEBUG if options[:debug]
 
-    opts.endpoint = URI(options[:endpoint]).to_s if options[:endpoint]
-
-    if options[:skip_ca_check]
-      silence_warnings { ::OpenSSL::SSL.const_set(:VERIFY_PEER, ::OpenSSL::SSL::VERIFY_NONE) }
-    end
-
     opts
   end
 
