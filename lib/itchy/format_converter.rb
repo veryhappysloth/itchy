@@ -36,7 +36,7 @@ module Itchy
              Mixlib::Shellout::InvalidCommandOption => ex
         Itchy::Log.fatal "[#{self.class.name}] Converting of image failed with " \
           "error messages #{convert_cmd.stderr}."
-        fail Itchy::Errors::FormatConvertingError, ex
+        fail Itchy::Errors::FormatConversionError, ex
       end
     end
   end
