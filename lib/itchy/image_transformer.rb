@@ -48,8 +48,8 @@ module Itchy
           converter = Itchy::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
           converter.convert!(file_format, @options.required_format, @options.output_dir)
         end
-      rescue Itchy::Errors::FileInspectingError, Itchy::Errors::FormatConvertingError,
-             Itchy::Errors::WorkingWithFilesError => ex
+      rescue Itchy::Errors::FileInspecError, Itchy::Errors::FormatConversionError,
+             Itchy::Errors::PrepareEnvError => ex
         fail Itchy::Errors::ImageTransformingError, ex
       end
     end
@@ -69,12 +69,12 @@ module Itchy
       rescue => ex
         Itchy::Log.error "[#{self.class.name}] Checking file format for" \
                                 "#{file} failed!"
-        fail Itchy::Errors::FileInspectingError, ex
+        fail Itchy::Errors::FileInspectError, ex
       end
       file_format = image_format_tester.stdout.scan(FORMAT_PATTERN)[0].flatten.first
       unless KNOWN_IMAGE_FORMATS.include? file_format
         Itchy::Log.error "Image format #{file_format} is unknown and not supported!"
-        fail Itchy::Errors::FileInspectingError
+        fail Itchy::Errors::FileInspectError
       end
       file_format
     end
@@ -96,9 +96,10 @@ module Itchy
       tar_cmd.run_command
       begin
         tar_cmd.error!
-      rescue => ex
+      rescue Mixlib::ShellOut::ShellCommandFailed, Mixlib::ShellOut::CommandTimeout,
+             Mixlib::ShellOut::InvalidCommandOption => ex
         Itchy::Log.error "Unpacking of archive failed with #{tar_cmd.stderr}"
-        fail Itchy::Errors::WorkingWithFilesError, ex
+        fail Itchy::Errors::PrepareEnvError, ex
       end
 
       unpacking_dir
@@ -143,7 +144,7 @@ module Itchy
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a link (copy) " \
           "for #{metadata.dc_identifier.inspect}: " \
           "#{ex.message}"
-        fail Itchy::Errors::WorkingWithFilesError, ex
+        fail Itchy::Errors::PrepareEnvError, ex
       end
     end
 
@@ -165,7 +166,7 @@ module Itchy
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a link (copy) " \
                                 "for #{metadata.dc_identifier.inspect}: " \
                                 "#{ex.message}"
-        fail Itchy::Errors::WorkingWithFilesError, ex
+        fail Itchy::Errors::PrepareEnvError, ex
       end
 
       unpacking_dir
@@ -194,7 +195,7 @@ module Itchy
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a directory " \
                                 "for #{metadata.dc_identifier.inspect}: " \
                                 "#{ex.message}"
-        fail Itchy::Errors::WorkingWithFilesError, ex
+        fail Itchy::Errors::PrepareEnvError, ex
       end
     end
 
@@ -207,10 +208,11 @@ module Itchy
       image_format_tester.run_command
       begin
         image_format_tester.error!
-      rescue
+      rescue Mixlib::ShellOut::ShellCommandFailed, Mixlib::ShellOut::CommandTimeout,
+             Mixlib::ShellOut::InvalidCommandOption => ex
         Itchy::Log.error "[#{self.class.name}] Checking file format for" \
           "#{file} failed with #{image_format_tester.stderr}"
-        fail Itchy::Errors::FileInspectingError, ex
+        fail Itchy::Errors::FileInspectError, ex
                                 
       end
       temp = image_format_tester.stdout
