@@ -1,4 +1,4 @@
 module Itchy::Errors
   #Covers errors with unpacking, copying, creating dirs.
-  class WorkingWithFilesError < Itchy::Errors::ImageTransformingError; end
+  class PrepareEnvError < Itchy::Errors::ImageTransformationError; end
 end

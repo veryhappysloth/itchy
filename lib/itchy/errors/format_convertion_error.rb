@@ -1,4 +1,4 @@
 module Itchy::Errors
   # Covers errors related to image format converting.
-  class FormatConvertingError < Itchy::Errors::ImageTransformingError; end
+  class FormatConvertionError < Itchy::Errors::ImageTransformationError; end
 end
