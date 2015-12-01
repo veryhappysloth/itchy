@@ -36,7 +36,7 @@ module Itchy
       begin
         event_handler = Itchy::EventHandlers.const_get("#{vmc_event.type}EventHandler")
       rescue NameError => ex
-        raise Itchy::Errors::UnknownEventError,
+        fail Itchy::Errors::UnknownEventError,
               "Unknown event type #{vmc_event.type.inspect} detected: #{ex.message}"
       end
 
