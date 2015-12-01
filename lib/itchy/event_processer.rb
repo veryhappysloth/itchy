@@ -28,7 +28,7 @@ module Itchy
             event_handler = Itchy::EventHandlers.const_get("#{event.type}EventHandler")
             event_handler = event_handler.new(vmc_configuration, options)
             event_handler.handle!(event, event_file)
-          rescue => ex
+          rescue => Itchy::Errors::EventHandleError => ex
             Itchy::Log.error "[#{self.class.name}] Due to error #{ex.message} event #{event_file}" \
               "was not processed!!! Continuing with next stored event."
             next
@@ -36,7 +36,7 @@ module Itchy
 
           begin
             clean_event!(event, event_file)
-          rescue => ex
+          rescue SystemCallError => ex
             Itchy::Log.error "[#{self.class.name}] Event #{event_file} was processed, but not cleaned!!!"
           end
 
@@ -72,7 +72,7 @@ module Itchy
     def read_event(json)
       Itchy::VmcatcherEvent.new(::File.read(json))
     rescue => ex
-      Itchy::Log.error '[]Failed to load event!!!'
+      Itchy::Log.error 'Failed to load event!!!'
       return ex
     end
 
@@ -85,7 +85,7 @@ module Itchy
 
       begin
         ::FileUtils.rm_f event_file
-      rescue => ex
+      rescue SystemCallError => ex
         Itchy::Log.fatal 'Failed to clean up event!!!'
         return ex
       end
