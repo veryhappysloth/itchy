@@ -50,7 +50,7 @@ module Itchy
         end
       rescue Itchy::Errors::FileInspecError, Itchy::Errors::FormatConversionError,
              Itchy::Errors::PrepareEnvError => ex
-        fail Itchy::Errors::ImageTransformingError, ex
+        fail Itchy::Errors::ImageTransformationError, ex
       end
     end
 
@@ -66,7 +66,8 @@ module Itchy
       image_format_tester.run_command
       begin
         image_format_tester.error!
-      rescue => ex
+      rescue Mixlib::ShellOut::ShellCommandFailed, Mixlib::ShellOut::CommandTimeout,
+             Mixlib::ShellOut::InvalidCommandOption => ex
         Itchy::Log.error "[#{self.class.name}] Checking file format for" \
                                 "#{file} failed!"
         fail Itchy::Errors::FileInspectError, ex
@@ -140,7 +141,7 @@ module Itchy
 
       begin
         ::FileUtils.ln_sf("#{directory}/#{metadata.dc_identifier}", @options.output_dir)
-      rescue => ex
+      rescue SystemCallError => ex
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a link (copy) " \
           "for #{metadata.dc_identifier.inspect}: " \
           "#{ex.message}"
@@ -162,7 +163,7 @@ module Itchy
           orig_image_file(metadata, vmcatcher_configuration),
           unpacking_dir
         )
-      rescue => ex
+      rescue SystemCallError => ex
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a link (copy) " \
                                 "for #{metadata.dc_identifier.inspect}: " \
                                 "#{ex.message}"
@@ -191,7 +192,7 @@ module Itchy
 
       begin
         ::FileUtils.mkdir_p temp_dir
-      rescue => ex
+      rescue SystemCallError => ex
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a directory " \
                                 "for #{metadata.dc_identifier.inspect}: " \
                                 "#{ex.message}"
