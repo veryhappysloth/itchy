@@ -66,8 +66,14 @@ module Itchy::EventHandlers
       name.slice! @options.metadata_dir
       dir_name = name
       dir_name.slice! '.json'
-      ::FileUtils.mkdir_p "#{@options.descriptor_dir}/#{dir_name}"
-      File.open("#{@options.descriptor_dir}#{dir_name}/#{name}.json", 'w') { |f| f.write(descriptor) }
+      begin
+        ::FileUtils.mkdir_p "#{@options.descriptor_dir}/#{dir_name}"
+        File.open("#{@options.descriptor_dir}#{dir_name}/#{name}.json", 'w') { |f| f.write(descriptor) }
+      rescue SystemCallError => ex
+        Itchy::Log.fatal "[#{self.class.name}] Failed to save a descriptor #{name}. " \
+          "Attempt failed with error #{ex.message}"
+          fail Itchy::Errors::PrepareEnvError, ex
+      end
     end
 
     protected

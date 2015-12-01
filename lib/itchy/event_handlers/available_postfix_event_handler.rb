@@ -9,7 +9,11 @@ module Itchy::EventHandlers
       super
       Itchy::Log.info "[#{self.class.name}] Handling updated image " \
                              "for #{vmcatcher_event.dc_identifier.inspect}"
-      save_descriptor(create_descriptor(vmcatcher_event), event_name)
+      begin
+        save_descriptor(create_descriptor(vmcatcher_event), event_name)
+      rescue Itchy::Errors::PrepareEnvError => ex
+
+      end
       image_transformer_instance = Itchy::ImageTransformer.new(@options)
       image_transformer_instance.transform!(vmcatcher_event, vmcatcher_configuration)
     end
