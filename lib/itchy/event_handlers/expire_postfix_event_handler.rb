@@ -9,7 +9,13 @@ module Itchy::EventHandlers
       super
       Itchy::Log.info "[#{self.class.name}] Handling expired image " \
                              "for #{vmcatcher_event.dc_identifier.inspect}"
-      save_descriptor(create_descriptor(vmcatcher_event), event_name)
+      begin
+        save_descriptor(create_descriptor(vmcatcher_event), event_name)
+      rescue Itchy::Errors::PrepareEnvError => ex
+        Itchy::Log.error "[#{self.cass.name}] Problem with handling event #{event_name}" \
+          "Event handling failed with #{ex.message}"
+        fail Itchy::Errors::EventHandleError, ex
+      end
     end
 
     private
