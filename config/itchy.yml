@@ -3,7 +3,7 @@ defaults: &defaults
   metadata_dir: /var/spool/onevmcatcher
   template_dir:
   output_dir:
-  descriptor_dir: /tmp/vmcatcher/descriptors
+  descriptor_dir: /vmcatcher/descriptors
   log_to: stderr
   log_level: error
   ca_path: /etc/grid-security/certificates

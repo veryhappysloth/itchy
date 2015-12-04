@@ -28,7 +28,7 @@ module Itchy
             event_handler = Itchy::EventHandlers.const_get("#{event.type}EventHandler")
             event_handler = event_handler.new(vmc_configuration, options)
             event_handler.handle!(event, event_file)
-          rescue => Itchy::Errors::EventHandleError => ex
+          rescue Itchy::Errors::EventHandleError => ex
             Itchy::Log.error "[#{self.class.name}] Due to error #{ex.message} event #{event_file}" \
               "was not processed!!! Continuing with next stored event."
             next
