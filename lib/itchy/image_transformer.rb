@@ -48,7 +48,7 @@ module Itchy
           converter = Itchy::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
           converter.convert!(file_format, @options.required_format, @options.output_dir)
         end
-      rescue Itchy::Errors::FileInspecError, Itchy::Errors::FormatConversionError,
+      rescue Itchy::Errors::FileInspectError, Itchy::Errors::FormatConversionError,
              Itchy::Errors::PrepareEnvError => ex
         fail Itchy::Errors::ImageTransformationError, ex
       end
