@@ -29,18 +29,18 @@ require 'openssl'
 class ItchyRunnable < Thor
   include Thor::Actions
 
-  AVAILABLE_LOG_LEVELS   = ['debug', 'info', 'warn', 'error', 'fatal', 'unknown'].freeze
-  AVAILABLE_AUTH_METHODS = ['none', 'basic'].freeze
+  AVAILABLE_LOG_LEVELS   = %w(debug info warn error fatal unknown).freeze
+  AVAILABLE_AUTH_METHODS = %w(none basic).freeze
 
-  shared_option_log_to = [:log_to, {:type => :string, :default => Itchy::Settings.log_to,
-		    	  :aliases => '-l', :desc => 'Logging output, file path or stderr/stdout'}]
+  shared_option_log_to = [:log_to, { type: :string, default: Itchy::Settings.log_to,
+                                     aliases: '-l', desc: 'Logging output, file path or stderr/stdout' }]
 
-  shared_option_log_level = [:log_level, {:enum => AVAILABLE_LOG_LEVELS,
-                             :default => Itchy::Settings.log_level,
-                	     :aliases => '-b', :desc => 'Logging level'}]
+  shared_option_log_level = [:log_level, { enum: AVAILABLE_LOG_LEVELS,
+                                           default: Itchy::Settings.log_level,
+                                           aliases: '-b', desc: 'Logging level' }]
 
-  shared_option_debug = [:debug, {:type => :boolean, :default => Itchy::Settings.debug,
-                	 :aliases => '-d', :desc => 'Enable debugging'}]
+  shared_option_debug = [:debug, { type: :boolean, default: Itchy::Settings.debug,
+                                   aliases: '-d', desc: 'Enable debugging' }]
 
   # Static method required by Thor to make certain
   # actions work.
@@ -49,8 +49,8 @@ class ItchyRunnable < Thor
   end
 
   desc 'archive', 'Handle an incoming vmcatcher event and store it for further processing'
-  method_option :metadata_dir, :type => :string, :default => Itchy::Settings.metadata_dir,
-                :aliases => '-m', :desc => 'Path to a metadata directory for storing events, must be writable'
+  method_option :metadata_dir, type: :string, default: Itchy::Settings.metadata_dir,
+                               aliases: '-m', desc: 'Path to a metadata directory for storing events, must be writable'
   method_option *shared_option_log_to
   method_option *shared_option_log_level
   method_option *shared_option_debug
@@ -70,16 +70,16 @@ class ItchyRunnable < Thor
   end
 
   desc 'process', 'Process stored events'
-  method_option :metadata_dir, :type => :string, :default => Itchy::Settings.metadata_dir,
-                :aliases => '-m', :desc => 'Path to a metadata directory for stored events'
-  method_option :required_format, :type => :string, :default => Itchy::Settings.output_image_format,
-		:aliases => '-f', :desc => 'Required output format of converted images'
-  method_option :output_dir, :type => :string, :default => Itchy::Settings.metadata_dir,
-		:aliases => '-o', :desc => 'Path to a directory where processed events descriptors will be stored'
-  method_option :descriptor_dir, :type => :string, :default => Itchy::Settings.descriptor_dir,
-                :aliases => '-e', :desc => 'Path to a directory where appliance descriptors will be stored'
-  method_option :input_image_formats, :type => :array, :default => Itchy::Settings.input_image_formats,
-		:aliases => '-i', :desc => 'Known input image formats'
+  method_option :metadata_dir, type: :string, default: Itchy::Settings.metadata_dir,
+                               aliases: '-m', desc: 'Path to a metadata directory for stored events'
+  method_option :required_format, type: :string, default: Itchy::Settings.output_image_format,
+                                  aliases: '-f', desc: 'Required output format of converted images'
+  method_option :output_dir, type: :string, default: Itchy::Settings.metadata_dir,
+                             aliases: '-o', desc: 'Path to a directory where processed events descriptors will be stored'
+  method_option :descriptor_dir, type: :string, default: Itchy::Settings.descriptor_dir,
+                                 aliases: '-e', desc: 'Path to a directory where appliance descriptors will be stored'
+  method_option :input_image_formats, type: :array, default: Itchy::Settings.input_image_formats,
+                                      aliases: '-i', desc: 'Known input image formats'
   method_option *shared_option_log_to
   method_option *shared_option_log_level
   method_option *shared_option_debug
@@ -116,12 +116,6 @@ class ItchyRunnable < Thor
     opts.log_level = Itchy::Log.const_get(options[:log_level].upcase)
     opts.log_level = Itchy::Log::DEBUG if options[:debug]
 
-    opts.endpoint = URI(options[:endpoint]).to_s if options[:endpoint]
-
-    if options[:skip_ca_check]
-      silence_warnings { ::OpenSSL::SSL.const_set(:VERIFY_PEER, ::OpenSSL::SSL::VERIFY_NONE) }
-    end
-
     opts
   end
 
@@ -129,9 +123,9 @@ class ItchyRunnable < Thor
   # Mostly stuff broken by using SettingsLogic with thor.
   def check_restrictions
     fail "Logging target #{options[:log_to].inspect} " \
-         "is not allowed!" if options[:log_to].nil? || options[:log_to].empty?
+         'is not allowed!' if options[:log_to].nil? || options[:log_to].empty?
     fail "Logging level #{options[:log_level].inspect} " \
-         "is not allowed!" unless AVAILABLE_LOG_LEVELS.include?(options[:log_level])
+         'is not allowed!' unless AVAILABLE_LOG_LEVELS.include?(options[:log_level])
   end
 
   # Initializes logging for Itchy::Log.

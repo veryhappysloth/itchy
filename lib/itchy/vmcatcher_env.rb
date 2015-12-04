@@ -1,7 +1,6 @@
 module Itchy
   # Wraps vmcatcher metadata taken from the environment.
   class VmcatcherEnv
-
     # Dummy keys
     REGISTERED_ENV_KEYS = [].freeze
 
@@ -12,7 +11,7 @@ module Itchy
     #
     # @param env [Object] hash-like or JSON-like object storing the raw environment
     def initialize(env)
-      env = ::JSON.parse(env) if env.kind_of?(String)
+      env = ::JSON.parse(env) if env.is_a?(String)
 
       @attributes = Itchy::Helpers::VmcatcherEnvHelper.select_from_env(
         env,
@@ -47,16 +46,13 @@ module Itchy
     end
 
     class << self
-
       # Creates an instance from a JSON document.
       #
       # @param json [String] JSON to create an instance from
       # @return [Itchy::VmcatcherEnv] instance
       def from_json(json)
-        self.new ::JSON.parse(json)
+        new ::JSON.parse(json)
       end
-
     end
-
   end
 end

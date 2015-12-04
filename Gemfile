@@ -1,6 +1,3 @@
-source "https://rubygems.org/"
-
-# Michenko CAD
-gem 'cloud-appliance-descriptor'
+source 'https://rubygems.org/'
 
 gemspec

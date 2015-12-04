@@ -4,7 +4,7 @@ require 'rubygems'
 if ENV['COVERAGE']
   require 'simplecov'
 
-  SimpleCov.add_filter "/spec/"
+  SimpleCov.add_filter '/spec/'
   SimpleCov.start
 end
 

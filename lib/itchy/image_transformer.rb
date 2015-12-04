@@ -1,13 +1,12 @@
 module Itchy
   # Wraps image format conversion methods and helpers.
   class ImageTransformer
-
     # Registered image formats and archives
     KNOWN_IMAGE_ARCHIVES = %w(ova tar).freeze
     KNOWN_IMAGE_FORMATS  = %w(cow dmg parallels qcow qcow2 raw vdi vmdk vhd).freeze
 
     # Archive format string msg
-    ARCHIVE_STRING = "POSIX tar archive"
+    ARCHIVE_STRING = 'POSIX tar archive'
 
     # REGEX pattern for getting image format
     FORMAT_PATTERN = /format:\s(.*?)$/
@@ -19,9 +18,9 @@ module Itchy
       @options = options
       @inputs = ([] << KNOWN_IMAGE_FORMATS << KNOWN_IMAGE_ARCHIVES).flatten
 
-      fail "Unsupported input image format enabled in configuration! " \
+      fail ArgumentError, 'Unsupported input image format enabled in configuration! ' \
            "#{@inputs.inspect}" unless (@options.input_image_formats - @inputs).empty?
-      #fail "Unsupported output image format enabled in configuration! " \
+      # fail "Unsupported output image format enabled in configuration! " \
       #     "#{KNOWN_IMAGE_FORMATS.inspect}" unless (@options.required_format - KNOWN_IMAGE_FORMATS).empty?
     end
 
@@ -35,19 +34,23 @@ module Itchy
     def transform!(metadata, vmcatcher_configuration)
       Itchy::Log.info "[#{self.class.name}] Transforming image format " \
                              "for #{metadata.dc_identifier.inspect}"
-
-      if archived?(metadata.dc_identifier.inspect)
-        unpacking_dir = unpack_archived!(metadata, vmcatcher_configuration)
-        file_format = inspect_unpacked_dir(unpacking_dir, metadata)
-      else
-        file_format = format(orig_image_file(metadata, vmcatcher_configuration))
-        unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
-      end
-      if file_format == @options.required_format
-        copy_same_format(unpacking_dir, metadata)
-      else
-        converter = Itchy::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
-        converter.convert!(file_format, @options.required_format, @options.output_dir)
+      begin
+        if archived?(metadata.dc_identifier.inspect)
+          unpacking_dir = unpack_archived!(metadata, vmcatcher_configuration)
+          file_format = inspect_unpacked_dir(unpacking_dir, metadata)
+        else
+          file_format = format(orig_image_file(metadata, vmcatcher_configuration))
+          unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
+        end
+        if file_format == @options.required_format
+          copy_same_format(unpacking_dir, metadata)
+        else
+          converter = Itchy::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
+          converter.convert!(file_format, @options.required_format, @options.output_dir)
+        end
+      rescue Itchy::Errors::FileInspectError, Itchy::Errors::FormatConversionError,
+             Itchy::Errors::PrepareEnvError => ex
+        fail Itchy::Errors::ImageTransformationError, ex
       end
     end
 
@@ -58,17 +61,21 @@ module Itchy
     #
     # @param unpacking_dir [String] name and path of the checked file
     # @return [String] image format
-    def format(file)  
+    def format(file)
       image_format_tester = Mixlib::ShellOut.new("qemu-img info #{file}")
       image_format_tester.run_command
-      if image_format_tester.error?
+      begin
+        image_format_tester.error!
+      rescue Mixlib::ShellOut::ShellCommandFailed, Mixlib::ShellOut::CommandTimeout,
+             Mixlib::ShellOut::InvalidCommandOption => ex
         Itchy::Log.error "[#{self.class.name}] Checking file format for" \
                                 "#{file} failed!"
+        fail Itchy::Errors::FileInspectError, ex
       end
       file_format = image_format_tester.stdout.scan(FORMAT_PATTERN)[0].flatten.first
       unless KNOWN_IMAGE_FORMATS.include? file_format
-        fail "Image format #{file_format}" \
-             " is unknown and not supported!"
+        Itchy::Log.error "Image format #{file_format} is unknown and not supported!"
+        fail Itchy::Errors::FileInspectError
       end
       file_format
     end
@@ -83,12 +90,18 @@ module Itchy
                              "for #{metadata.dc_identifier.inspect}"
 
       unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration)
-      tar_cmd = ::Mixlib::ShellOut.new("/bin/tar",
+      tar_cmd = ::Mixlib::ShellOut.new('/bin/tar',
                                        "--restrict -C #{unpacking_dir} " \
                                        "-xvf #{orig_image_file(metadata, vmcatcher_configuration)}",
-                                       :env => nil, :cwd => '/tmp')
+                                       env: nil, cwd: '/tmp')
       tar_cmd.run_command
-      tar_cmd.error!
+      begin
+        tar_cmd.error!
+      rescue Mixlib::ShellOut::ShellCommandFailed, Mixlib::ShellOut::CommandTimeout,
+             Mixlib::ShellOut::InvalidCommandOption => ex
+        Itchy::Log.error "Unpacking of archive failed with #{tar_cmd.stderr}"
+        fail Itchy::Errors::PrepareEnvError, ex
+      end
 
       unpacking_dir
     end
@@ -100,22 +113,22 @@ module Itchy
     # @param directory [String] name of directory where '.ova' or '.tar' is unpacked
     # @param metadata [Itchy::VmcatcherEvent] event metadata
     # @return [String] format of image or nil.
-    def inspect_unpacked_dir(directory, metadata, identifier)
+    def inspect_unpacked_dir(directory, metadata, _identifier)
       dir = Dir.new directory
       counter = 0
-      files = dir["*"]
+      files = dir['*']
       files each do |file|
         file_format = format("#{directory}/#{file}")
         if KNOWN_IMAGE_FORMATS.include? file_format
-          counter+1
+          counter += 1
           # unsupported ova content (more than one disk)
           return nil if counter > 1
-          File.new("#{directory}/#{file}","r").rename(file, "#{metadata.dc_identifier}.#{file_format}")
+          File.new("#{directory}/#{file}", 'r').rename(file, "#{metadata.dc_identifier}.#{file_format}")
         end
       end
-        return nil if counter == 0
+      return nil if counter == 0
 
-        file_format
+      file_format
     end
 
     #
@@ -124,19 +137,17 @@ module Itchy
     # @param metadata [Itchy::VmcatcherEvent] event metadata
     def copy_same_format(directory, metadata)
       Itchy::Log.info "[#{self.class.name}] Image #{metadata.dc_identifier.inspect} " \
-        "is already in the required format. Copying it to output directory."
+        'is already in the required format. Copying it to output directory.'
 
       begin
         ::FileUtils.ln_sf("#{directory}/#{metadata.dc_identifier}", @options.output_dir)
-      rescue => ex
+      rescue SystemCallError => ex
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a link (copy) " \
           "for #{metadata.dc_identifier.inspect}: " \
           "#{ex.message}"
-        fail ex
+        fail Itchy::Errors::PrepareEnvError, ex
       end
     end
-
-
 
     #
     #
@@ -152,15 +163,15 @@ module Itchy
           orig_image_file(metadata, vmcatcher_configuration),
           unpacking_dir
         )
-      rescue => ex
+      rescue SystemCallError => ex
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a link (copy) " \
                                 "for #{metadata.dc_identifier.inspect}: " \
                                 "#{ex.message}"
-        fail ex
+        fail Itchy::Errors::PrepareEnvError, ex
       end
 
       unpacking_dir
-  end
+    end
 
     #
     #
@@ -181,11 +192,11 @@ module Itchy
 
       begin
         ::FileUtils.mkdir_p temp_dir
-      rescue => ex
+      rescue SystemCallError => ex
         Itchy::Log.fatal "[#{self.class.name}] Failed to create a directory " \
                                 "for #{metadata.dc_identifier.inspect}: " \
                                 "#{ex.message}"
-        fail ex
+        fail Itchy::Errors::PrepareEnvError, ex
       end
     end
 
@@ -196,13 +207,17 @@ module Itchy
     def archived?(file)
       image_format_tester = Mixlib::ShellOut.new("file #{file}")
       image_format_tester.run_command
-      if image_format_tester.error?
+      begin
+        image_format_tester.error!
+      rescue Mixlib::ShellOut::ShellCommandFailed, Mixlib::ShellOut::CommandTimeout,
+             Mixlib::ShellOut::InvalidCommandOption => ex
         Itchy::Log.error "[#{self.class.name}] Checking file format for" \
-                                "#{file} failed!"
+          "#{file} failed with #{image_format_tester.stderr}"
+        fail Itchy::Errors::FileInspectError, ex
+                                
       end
       temp = image_format_tester.stdout
       temp.include? ARCHIVE_STRING
     end
-  
   end
 end
