@@ -28,7 +28,8 @@ module Itchy
                              "original format: #{file_format} to " \
                              "required format: #{required_format}."
 
-      convert_cmd = Mixlib::ShellOut.new("qemu-img convert -f #{file_format} -O #{required_format} #{@unpacking_dir}/#{@metadata.dc_identifier} #{output_dir}/#{@metadata.dc_identifier}")
+      new_file_name = "#{::Time.now.to_i}_#{@metadata.dc_identifier}"
+      convert_cmd = Mixlib::ShellOut.new("qemu-img convert -f #{file_format} -O #{required_format} #{@unpacking_dir}/#{@metadata.dc_identifier} #{output_dir}/#{new_file_name}")
       convert_cmd.run_command
       begin
         convert_cmd.error!
@@ -38,6 +39,7 @@ module Itchy
           "error messages #{convert_cmd.stderr}."
         fail Itchy::Errors::FormatConversionError, ex
       end
+      new_file_name
     end
   end
 end
