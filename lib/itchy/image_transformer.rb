@@ -123,7 +123,7 @@ module Itchy
           counter += 1
           # unsupported ova content (more than one disk)
           return nil if counter > 1
-          File.new("#{directory}/#{file}", 'r').rename(file, "#{metadata.dc_identifier}.#{file_format}")
+          File.new("#{directory}/#{file}", 'r').rename(file, "#{metadata.dc_identifier}")
         end
       end
       return nil if counter == 0
