@@ -23,7 +23,6 @@ module Itchy
 
       archived_events do |event, event_file|
         begin
-          
           begin
             event_handler = Itchy::EventHandlers.const_get("#{event.type}EventHandler")
             event_handler = event_handler.new(vmc_configuration, options)
@@ -82,6 +81,7 @@ module Itchy
     # @param event_file [String] path to file containing event info
     def clean_event!(_event, event_file)
       Itchy::Log.info "[#{self.class.name}] Cleaning up"
+      Itchy::Log.debug "[#{self.class.name}] Deleting file #{event_file}"
 
       begin
         ::FileUtils.rm_f event_file
