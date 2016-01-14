@@ -51,7 +51,6 @@ module Itchy
         self.class.send :define_method, method_id do
           temp = VMCATCHER_ATTR_PREFIX + method_id.to_s.upcase
 
-          Itchy::Log.debug "[#{method_id}] METHOD MISSING CALL "
           attributes[temp]
         end
         send(method_id)

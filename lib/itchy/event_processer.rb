@@ -28,8 +28,8 @@ module Itchy
             event_handler = event_handler.new(vmc_configuration, options)
             event_handler.handle!(event, event_file)
           rescue Itchy::Errors::EventHandleError => ex
-            Itchy::Log.error "[#{self.class.name}] Due to error #{ex.message} event #{event_file}" \
-              "was not processed!!! Aborting."
+            Itchy::Log.error "[#{self.class.name}] Due to error '#{ex.message}' event '#{event_file}'" \
+              " was not processed!!! Aborting."
               fail RuntimeError, "Unprocessed event"
           end
 
@@ -86,7 +86,7 @@ module Itchy
       begin
         ::FileUtils.rm_f event_file
       rescue SystemCallError => ex
-        Itchy::Log.fatal 'Failed to clean up event!!!'
+        Itchy::Log.error 'Failed to clean up event!!!'
         return ex
       end
     end
