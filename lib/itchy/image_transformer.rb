@@ -43,15 +43,16 @@ module Itchy
           unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
         end
         if file_format == @options.required_format
-          copy_same_format(unpacking_dir, metadata)
+          new_file_name = copy_same_format(unpacking_dir, metadata)
         else
           converter = Itchy::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
-          converter.convert!(file_format, @options.required_format, @options.output_dir)
+          new_file_name = converter.convert!(file_format, @options.required_format, @options.output_dir)
         end
       rescue Itchy::Errors::FileInspectError, Itchy::Errors::FormatConversionError,
              Itchy::Errors::PrepareEnvError => ex
         fail Itchy::Errors::ImageTransformationError, ex
       end
+      new_file_name
     end
 
     private
@@ -123,7 +124,7 @@ module Itchy
           counter += 1
           # unsupported ova content (more than one disk)
           return nil if counter > 1
-          File.new("#{directory}/#{file}", 'r').rename(file, "#{metadata.dc_identifier}.#{file_format}")
+          File.new("#{directory}/#{file}", 'r').rename(file, "#{metadata.dc_identifier}")
         end
       end
       return nil if counter == 0
@@ -131,25 +132,28 @@ module Itchy
       file_format
     end
 
-    #
+    # Method moves image files to output directory
     #
     # @param directory [String] name of directory where image is saved
     # @param metadata [Itchy::VmcatcherEvent] event metadata
     def copy_same_format(directory, metadata)
       Itchy::Log.info "[#{self.class.name}] Image #{metadata.dc_identifier.inspect} " \
-        'is already in the required format. Copying it to output directory.'
+        'is already in the required format. Moving it to output directory.'
 
+      new_file_name = "#{::Time.now.to_i}_#{metadata.dc_identifier}"
       begin
-        ::FileUtils.ln_sf("#{directory}/#{metadata.dc_identifier}", @options.output_dir)
+        ::FileUtils.mv("#{directory}/#{metadata.dc_identifier}",
+                          "#{@options.output_dir}/#{new_file_name}")
       rescue SystemCallError => ex
-        Itchy::Log.fatal "[#{self.class.name}] Failed to create a link (copy) " \
+        Itchy::Log.fatal "[#{self.class.name}] Failed to move a file " \
           "for #{metadata.dc_identifier.inspect}: " \
           "#{ex.message}"
         fail Itchy::Errors::PrepareEnvError, ex
       end
+      new_file_name
     end
 
-    #
+    # Method for copying image file from vmCatcher cache to processing places
     #
     # @param metadata [Itchy::VmcatcherEvent] event metadata
     # @param vmcatcher_configuration [Itchy::VmcatcherConfiguration] current VMC configuration
@@ -159,12 +163,12 @@ module Itchy
                              "for #{metadata.dc_identifier.inspect}"
       unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration).flatten.first
       begin
-        ::FileUtils.ln_sf(
+        ::FileUtils.cp(
           orig_image_file(metadata, vmcatcher_configuration),
           unpacking_dir
         )
       rescue SystemCallError => ex
-        Itchy::Log.fatal "[#{self.class.name}] Failed to create a link (copy) " \
+        Itchy::Log.fatal "[#{self.class.name}] Failed to create a copy " \
                                 "for #{metadata.dc_identifier.inspect}: " \
                                 "#{ex.message}"
         fail Itchy::Errors::PrepareEnvError, ex

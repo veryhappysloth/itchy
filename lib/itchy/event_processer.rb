@@ -23,15 +23,14 @@ module Itchy
 
       archived_events do |event, event_file|
         begin
-          
           begin
             event_handler = Itchy::EventHandlers.const_get("#{event.type}EventHandler")
             event_handler = event_handler.new(vmc_configuration, options)
             event_handler.handle!(event, event_file)
           rescue Itchy::Errors::EventHandleError => ex
-            Itchy::Log.error "[#{self.class.name}] Due to error #{ex.message} event #{event_file}" \
-              "was not processed!!! Continuing with next stored event."
-            next
+            Itchy::Log.error "[#{self.class.name}] Due to error '#{ex.message}' event '#{event_file}'" \
+              " was not processed!!! Aborting."
+              fail RuntimeError, "Unprocessed event"
           end
 
           begin
@@ -82,11 +81,12 @@ module Itchy
     # @param event_file [String] path to file containing event info
     def clean_event!(_event, event_file)
       Itchy::Log.info "[#{self.class.name}] Cleaning up"
+      Itchy::Log.debug "[#{self.class.name}] Deleting file #{event_file}"
 
       begin
         ::FileUtils.rm_f event_file
       rescue SystemCallError => ex
-        Itchy::Log.fatal 'Failed to clean up event!!!'
+        Itchy::Log.error 'Failed to clean up event!!!'
         return ex
       end
     end
