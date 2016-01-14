@@ -63,9 +63,9 @@ module Itchy::EventHandlers
     # @param name [String] name of appliance descriptor (event name)
     def save_descriptor(descriptor, name)
       begin
-        File.open("#{@options.descriptor_dir}/#{File.basename(whole_path)}", 'w') { |f| f.write(descriptor) }
+        File.open("#{@options.descriptor_dir}/#{File.basename(name)}", 'w') { |f| f.write(descriptor) }
       rescue SystemCallError => ex
-        Itchy::Log.fatal "[#{self.class.name}] Failed to save a descriptor #{File.basename(whole_path)}. " \
+        Itchy::Log.fatal "[#{self.class.name}] Failed to save a descriptor #{File.basename(name)}. " \
           "Attempt failed with error #{ex.message}"
           fail Itchy::Errors::PrepareEnvError, ex
       end
