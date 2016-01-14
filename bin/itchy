@@ -31,6 +31,7 @@ class ItchyRunnable < Thor
 
   AVAILABLE_LOG_LEVELS   = %w(debug info warn error fatal unknown).freeze
   AVAILABLE_AUTH_METHODS = %w(none basic).freeze
+  ERROR_EXIT_CODE = 1
 
   shared_option_log_to = [:log_to, { type: :string, default: Itchy::Settings.log_to,
                                      aliases: '-l', desc: 'Logging output, file path or stderr/stdout' }]
@@ -91,8 +92,12 @@ class ItchyRunnable < Thor
 
     Itchy::Log.info "[#{self.class.name}] Processing started"
     Itchy::Log.debug "[#{self.class.name}] With options: #{opts.inspect}"
+    begin
+      Itchy::EventProcesser.new(Itchy::VmcatcherConfiguration.new(ENV), opts).process!
+    rescue RuntimeError
+      exit ERROR_EXIT_CODE
+    end
 
-    Itchy::EventProcesser.new(Itchy::VmcatcherConfiguration.new(ENV), opts).process!
   end
 
   private
@@ -137,6 +142,12 @@ class ItchyRunnable < Thor
     logger.level = opts.log_level
     logger
   end
+
+  # Overrides thors method for exiting
+  def exit_on_failure?
+    true
+  end
+
 end
 
 ItchyRunnable.start

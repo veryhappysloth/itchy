@@ -29,8 +29,8 @@ module Itchy
             event_handler.handle!(event, event_file)
           rescue Itchy::Errors::EventHandleError => ex
             Itchy::Log.error "[#{self.class.name}] Due to error #{ex.message} event #{event_file}" \
-              "was not processed!!! Continuing with next stored event."
-            next
+              "was not processed!!! Aborting."
+              fail RuntimeError, "Unprocessed event"
           end
 
           begin
