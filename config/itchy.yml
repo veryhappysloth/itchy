@@ -6,9 +6,6 @@ defaults: &defaults
   log_to: stderr
   log_level: error
   debug: false
-  input_image_formats:
-  - raw
-  - ova
   output_image_format: qcow2
   qemu_img_binary: /usr/bin/qemu-img
 

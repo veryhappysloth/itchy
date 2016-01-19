@@ -79,8 +79,6 @@ class ItchyRunnable < Thor
                              aliases: '-o', desc: 'Path to a directory where processed events descriptors will be stored'
   method_option :descriptor_dir, type: :string, default: Itchy::Settings.descriptor_dir,
                                  aliases: '-e', desc: 'Path to a directory where appliance descriptors will be stored'
-  method_option :input_image_formats, type: :array, default: Itchy::Settings.input_image_formats,
-                                      aliases: '-i', desc: 'Known input image formats'
   method_option *shared_option_log_to
   method_option *shared_option_log_level
   method_option *shared_option_debug
