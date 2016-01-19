@@ -18,8 +18,8 @@ module Itchy
       @options = options
       @inputs = ([] << KNOWN_IMAGE_FORMATS << KNOWN_IMAGE_ARCHIVES).flatten
 
-      fail ArgumentError, 'Unsupported input image format enabled in configuration! ' \
-           "#{@inputs.inspect}" unless (@options.input_image_formats - @inputs).empty?
+      #fail ArgumentError, 'Unsupported input image format enabled in configuration! ' \
+      #     "#{@inputs.inspect}" unless (@options.input_image_formats - @inputs).empty?
       # fail "Unsupported output image format enabled in configuration! " \
       #     "#{KNOWN_IMAGE_FORMATS.inspect}" unless (@options.required_format - KNOWN_IMAGE_FORMATS).empty?
     end
