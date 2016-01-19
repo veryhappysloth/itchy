@@ -1,15 +1,11 @@
 ---
 defaults: &defaults
-  metadata_dir: /var/spool/onevmcatcher
-  template_dir:
-  output_dir:
-  descriptor_dir: /vmcatcher/descriptors
+  metadata_dir: /var/spool/itchy/metadata
+  output_dir: /var/spool/itchy/output
+  descriptor_dir: var/spool/itchy/descriptors
   log_to: stderr
   log_level: error
-  ca_path: /etc/grid-security/certificates
-  ca_file:
   debug: false
-  skip_ca_check: false
   input_image_formats:
   - raw
   - ova
