@@ -8,7 +8,6 @@ defaults: &defaults
   debug: false
   permissions:
     file: '0660'
-    directory: '0770'
   output_image_format: qcow2
   qemu_img_binary: /usr/bin/qemu-img
 
