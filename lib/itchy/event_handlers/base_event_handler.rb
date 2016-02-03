@@ -54,7 +54,7 @@ module Itchy::EventHandlers
       unless vmcatcher_event.is_a?(Itchy::VmcatcherEvent)
         fail ArgumentError, '\'vmcatcher_event\' must be an instance of ' \
                 'Itchy::VmcatcherEvent!'
-            end
+      end
     end
 
     # Save created descriptor to descriptor directory.
@@ -68,6 +68,19 @@ module Itchy::EventHandlers
         Itchy::Log.fatal "[#{self.class.name}] Failed to save a descriptor #{File.basename(name)}. " \
           "Attempt failed with error #{ex.message}"
           fail Itchy::Errors::PrepareEnvError, ex
+      end
+      # file permissions for descriptor
+      set_file_permissions(File.join(@options.descriptor_dir, File.basename(name)))
+    end
+
+    def set_file_permissions(file)
+      Itchy::Log.debug "[#{self.class.name}] Setting file permissions for file #{file} to #{@options.file_permissions}."
+
+      begin
+        ::FileUtils.chmod @options.file_permissions.to_i(8), file
+      rescue SystemCallError => ex
+        Itchy::Log.error 'Failed to set permissions!!!'
+        fail Itchy::Errors::PrepareEnvError, ex
       end
     end
 

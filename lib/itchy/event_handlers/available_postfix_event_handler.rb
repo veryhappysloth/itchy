@@ -13,6 +13,8 @@ module Itchy::EventHandlers
         image_transformer_instance = Itchy::ImageTransformer.new(@options)
         new_file_name = image_transformer_instance.transform!(vmcatcher_event, vmcatcher_configuration)
         save_descriptor(create_descriptor(vmcatcher_event, new_file_name), event_name)
+        # file permissions for image
+        set_file_permissions(File.join(@options.output_dir, new_file_name))
       rescue Itchy::Errors::PrepareEnvError, ArgumentError, Itchy::Errors::ImageTransformationError  => ex
         Itchy::Log.error "[#{self.class.name}] Problem with handling event #{event_name}" \
           "Event handling failed with #{ex.message}"

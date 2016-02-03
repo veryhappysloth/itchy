@@ -64,7 +64,7 @@ module Itchy
 
     # Creates VmcatcherEvent instance.
     #
-    # @param json json [String] path to file containing json representation
+    # @param json [String] path to file containing json representation
     # of vmcatcher event
     #
     # @return [VmcatcherEvent] instance representing event
