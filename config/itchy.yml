@@ -6,6 +6,8 @@ defaults: &defaults
   log_to: stderr
   log_level: error
   debug: false
+  permissions:
+    file: '0660'
   output_image_format: qcow2
   qemu_img_binary: /usr/bin/qemu-img
 
