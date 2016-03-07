@@ -72,7 +72,7 @@ module Itchy
       Itchy::VmcatcherEvent.new(::File.read(json))
     rescue => ex
       Itchy::Log.error 'Failed to load event!!!'
-      return ex
+      return false
     end
 
     # Deletes event file.
