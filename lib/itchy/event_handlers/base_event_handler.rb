@@ -44,6 +44,7 @@ module Itchy::EventHandlers
       temp_file.flush
 
       ::FileUtils.cp(temp_file.path, permanent_file_path)
+      set_file_permissions(permanent_file_path)
       temp_file.close
 
       true
