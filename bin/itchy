@@ -33,9 +33,6 @@ class ItchyRunnable < Thor
   AVAILABLE_AUTH_METHODS = %w(none basic).freeze
   ERROR_EXIT_CODE = 1
 
-  shared_option_log_to = [:log_to, { type: :string, default: Itchy::Settings.log_to,
-                                     aliases: '-l', desc: 'Logging output, file path or stderr/stdout' }]
-
   shared_option_log_level = [:log_level, { enum: AVAILABLE_LOG_LEVELS,
                                            default: Itchy::Settings.log_level,
                                            aliases: '-b', desc: 'Logging level' }]
@@ -52,7 +49,10 @@ class ItchyRunnable < Thor
   desc 'archive', 'Handle an incoming vmcatcher event and store it for further processing'
   method_option :metadata_dir, type: :string, default: Itchy::Settings.metadata_dir,
                                aliases: '-m', desc: 'Path to a metadata directory for storing events, must be writable'
-  method_option *shared_option_log_to
+  method_option :log_to, type: :string, default: Itchy::Settings.log_to.archive_log, aliasses: '-l',
+                                desc: 'Logging output, file path or stderr/stdout'
+  method_option :file_permissions, type: :string, default: Itchy::Settings['permissions']['file'],
+                    aliases: '-p', desc: 'Sets permissions for all created files'
   method_option *shared_option_log_level
   method_option *shared_option_debug
 
@@ -81,7 +81,8 @@ class ItchyRunnable < Thor
                                  aliases: '-e', desc: 'Path to a directory where appliance descriptors will be stored'
   method_option :file_permissions, type: :string, default: Itchy::Settings['permissions']['file'],
                                 aliases: '-p', desc: 'Sets permissions for all created files'
-  method_option *shared_option_log_to
+  method_option :log_to, type: :string, default: Itchy::Settings.log_to.process_log, aliases: '-l',
+                                desc: 'Logging output, file path or stderr/stdout'
   method_option *shared_option_log_level
   method_option *shared_option_debug
 
