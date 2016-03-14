@@ -75,7 +75,7 @@ class ItchyRunnable < Thor
                                aliases: '-m', desc: 'Path to a metadata directory for stored events'
   method_option :required_format, type: :string, default: Itchy::Settings.output_image_format,
                                   aliases: '-f', desc: 'Required output format of converted images'
-  method_option :output_dir, type: :string, default: Itchy::Settings.metadata_dir,
+  method_option :output_dir, type: :string, default: Itchy::Settings.output_dir,
                              aliases: '-o', desc: 'Path to a directory where processed events descriptors will be stored'
   method_option :descriptor_dir, type: :string, default: Itchy::Settings.descriptor_dir,
                                  aliases: '-e', desc: 'Path to a directory where appliance descriptors will be stored'

@@ -48,6 +48,7 @@ module Itchy
           converter = Itchy::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
           new_file_name = converter.convert!(file_format, @options.required_format, @options.output_dir)
         end
+        remove_dir(unpacking_dir)
       rescue Itchy::Errors::FileInspectError, Itchy::Errors::FormatConversionError,
              Itchy::Errors::PrepareEnvError => ex
         fail Itchy::Errors::ImageTransformationError, ex
@@ -153,6 +154,15 @@ module Itchy
       new_file_name
     end
 
+    def remove_dir(path)
+      Itchy::Log.debug "[#{self.class.name}] Deleting temporary image dir #{path}."
+      begin
+        ::FileUtils.remove_dir(path)
+      rescue SystemCallError => ex
+        Itchy::Log.error "[#{self.class.name}] Failed to delete temporary dir #{path}!"
+        fail Itchy::Errors::PrepareEnvError, ex
+      end
+    end
     # Method for copying image file from vmCatcher cache to processing places
     #
     # @param metadata [Itchy::VmcatcherEvent] event metadata
