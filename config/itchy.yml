@@ -4,12 +4,12 @@ defaults: &defaults
   output_dir: /var/spool/itchy/output
   descriptor_dir: /var/spool/itchy/descriptors
   log_to:
-    archive_log: stderr
-    process_log: stderr
+    archive_log: /var/log/itchy/archive.log
+    process_log: /var/log/itchy/process.log
   log_level: error
   debug: false
   permissions:
-    file: '0660'
+    file: '0664'
   output_image_format: qcow2
   qemu_img_binary: /usr/bin/qemu-img
 
