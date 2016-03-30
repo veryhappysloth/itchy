@@ -122,7 +122,7 @@ module Itchy
       dir = Dir.new directory
       counter = 0
       files = dir['*']
-      files each do |file|
+      files.each do |file|
         file_format = format("#{directory}/#{file}")
         if KNOWN_IMAGE_FORMATS.include? file_format
           counter += 1
