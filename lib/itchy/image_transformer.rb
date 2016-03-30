@@ -202,7 +202,7 @@ module Itchy
     # @param vmcatcher_configuration [Itchy::VmcatcherConfiguration] current VMC configuration
     # @return [String] path to the newly created image directory
     def prepare_image_temp_dir(metadata, vmcatcher_configuration)
-      temp_dir = "#{vmcatcher_configuration.cache_dir_cache}/temp/#{metadata.dc_identifier}"
+      temp_dir = "#{@options.temp_image_dir}/#{metadata.dc_identifier}"
 
       begin
         ::FileUtils.mkdir_p temp_dir

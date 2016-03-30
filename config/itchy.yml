@@ -3,6 +3,7 @@ defaults: &defaults
   metadata_dir: /var/spool/itchy/metadata
   output_dir: /var/spool/itchy/output
   descriptor_dir: /var/spool/itchy/descriptors
+  temp_image_dir: /var/spool/itchy/temp
   log_to:
     archive_log: /var/log/itchy/archive.log
     process_log: /var/log/itchy/process.log
