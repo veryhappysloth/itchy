@@ -64,7 +64,10 @@ module Itchy
     # @param unpacking_dir [String] name and path of the checked file
     # @return [String] image format
     def format(file)
-      image_format_tester = Mixlib::ShellOut.new("qemu-img info #{file}")
+
+      qemu_command = @options.qemu_img_binary || Itchy::BASIC_QEMU_COMMAND
+
+      image_format_tester = Mixlib::ShellOut.new("#{qemu_command} info #{file}")
       image_format_tester.run_command
       begin
         image_format_tester.error!

@@ -2,7 +2,6 @@ module Itchy
   # Converting different image formats
   class FormatConverter
 
-    BASIC_QEMU_COMMAND = 'qemu-img'
 
     # Creates and converter instance for converting image to requried format
     #
@@ -33,7 +32,7 @@ module Itchy
                              "required format: #{required_format}."
 
       new_file_name = "#{::Time.now.to_i}_#{@metadata.dc_identifier}"
-      qemu_command = qemu_img_binary || BASIC_QEMU_COMMAND
+      qemu_command = qemu_img_binary || Itchy::BASIC_QEMU_COMMAND
       convert_cmd = Mixlib::ShellOut.new("#{qemu_command} convert -f #{file_format} -O #{required_format} #{@unpacking_dir}/#{@metadata.dc_identifier} #{output_dir}/#{new_file_name}")
       convert_cmd.run_command
       begin
