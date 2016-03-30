@@ -46,7 +46,7 @@ module Itchy
           new_file_name = copy_same_format(unpacking_dir, metadata)
         else
           converter = Itchy::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
-          new_file_name = converter.convert!(file_format, @options.required_format, @options.output_dir)
+          new_file_name = converter.convert!(file_format, @options.required_format, @options.output_dir, @options.qemu_img_binary)
         end
         remove_dir(unpacking_dir)
       rescue Itchy::Errors::FileInspectError, Itchy::Errors::FormatConversionError,

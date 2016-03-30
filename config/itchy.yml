@@ -12,7 +12,7 @@ defaults: &defaults
   permissions:
     file: '0664'
   output_image_format: qcow2
-  qemu_img_binary: /usr/bin/qemu-img
+  #qemu_img_binary: # When used, ITCHY will use this binary to run qemu-img command (converting images)
 
 ###############################################
 #######  DO NOT EDIT AFTER THIS POINT  ########
