@@ -47,12 +47,25 @@ class ItchyRunnable < Thor
   end
 
   desc 'archive', 'Handle an incoming vmcatcher event and store it for further processing'
-  method_option :metadata_dir, type: :string, default: Itchy::Settings.metadata_dir,
-                               aliases: '-m', desc: 'Path to a metadata directory for storing events, must be writable'
-  method_option :log_to, type: :string, default: Itchy::Settings.log_to.archive_log, aliasses: '-l',
-                                desc: 'Logging output, file path or stderr/stdout'
-  method_option :file_permissions, type: :string, default: Itchy::Settings['permissions']['file'],
-                    aliases: '-p', desc: 'Sets permissions for all created files'
+  
+  method_option :metadata_dir,
+                type: :string,
+                default: Itchy::Settings.metadata_dir,
+                aliases: '-m',
+                desc: 'Path to a metadata directory for storing events, must be writable'
+  
+  method_option :log_to,
+                type: :string,
+                default: Itchy::Settings.log_to.archive_log,
+                aliasses: '-l',
+                desc: 'Logging output, file path or stderr/stdout'
+  
+  method_option :file_permissions,
+                type: :string,
+                default: Itchy::Settings['permissions']['file'],
+                aliases: '-p',
+                desc: 'Sets permissions for all created files'
+  
   method_option *shared_option_log_level
   method_option *shared_option_debug
 
@@ -71,18 +84,56 @@ class ItchyRunnable < Thor
   end
 
   desc 'process', 'Process stored events'
-  method_option :metadata_dir, type: :string, default: Itchy::Settings.metadata_dir,
-                               aliases: '-m', desc: 'Path to a metadata directory for stored events'
-  method_option :required_format, type: :string, default: Itchy::Settings.output_image_format,
-                                  aliases: '-f', desc: 'Required output format of converted images'
-  method_option :output_dir, type: :string, default: Itchy::Settings.output_dir,
-                             aliases: '-o', desc: 'Path to a directory where processed events descriptors will be stored'
-  method_option :descriptor_dir, type: :string, default: Itchy::Settings.descriptor_dir,
-                                 aliases: '-e', desc: 'Path to a directory where appliance descriptors will be stored'
-  method_option :file_permissions, type: :string, default: Itchy::Settings['permissions']['file'],
-                                aliases: '-p', desc: 'Sets permissions for all created files'
-  method_option :log_to, type: :string, default: Itchy::Settings.log_to.process_log, aliases: '-l',
-                                desc: 'Logging output, file path or stderr/stdout'
+  
+  method_option :metadata_dir,
+                type: :string,
+                default: Itchy::Settings.metadata_dir,
+                aliases: '-m',
+                desc: 'Path to a metadata directory for stored events'
+  
+  method_option :required_format,
+                type: :string,
+                default: Itchy::Settings.output_image_format,
+                aliases: '-f',
+                desc: 'Required output format of converted images'
+  
+  method_option :output_dir,
+                type: :string,
+                default: Itchy::Settings.output_dir,
+                aliases: '-o',
+                desc: 'Path to a directory where processed events descriptors will be stored'
+  
+  method_option :temp_image_dir,
+                type: :string,
+                default: Itchy::Settings.temp_image_dir,
+                aliases: '-t',
+                desc: 'Path to a directory where images will be temporary stored while being processed'
+  
+  method_option :descriptor_dir,
+                type: :string,
+                default: Itchy::Settings.descriptor_dir,
+                aliases: '-e',
+                desc: 'Path to a directory where appliance descriptors will be stored'
+  
+  method_option :file_permissions,
+                type: :string,
+                default: Itchy::Settings['permissions']['file'],
+                aliases: '-p',
+                desc: 'Sets permissions for all created files'
+  
+  method_option :log_to,
+                type: :string,
+                default: Itchy::Settings.log_to.process_log,
+                aliases: '-l',
+                desc: 'Logging output, file path or stderr/stdout'
+  
+  
+  method_option :qemu_img_binary,
+                type: :string,
+                default: Itchy::Settings['qemu_img_binary'],
+                aliases: '-q',
+                desc: 'Path to qemu-img command binary, if not used, ITCHY will look for it in PATH'
+
   method_option *shared_option_log_level
   method_option *shared_option_debug
 

@@ -9,7 +9,9 @@ require 'hashie/mash'
 require 'cloud-appliance-descriptor'
 
 # Wraps all internals of the handler.
-module Itchy; end
+module Itchy
+  BASIC_QEMU_COMMAND = 'qemu-img'
+end
 
 require 'itchy/version'
 require 'itchy/settings'

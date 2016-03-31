@@ -3,6 +3,7 @@ defaults: &defaults
   metadata_dir: /var/spool/itchy/metadata
   output_dir: /var/spool/itchy/output
   descriptor_dir: /var/spool/itchy/descriptors
+  temp_image_dir: /var/spool/itchy/temp
   log_to:
     archive_log: /var/log/itchy/archive.log
     process_log: /var/log/itchy/process.log
@@ -11,7 +12,7 @@ defaults: &defaults
   permissions:
     file: '0664'
   output_image_format: qcow2
-  qemu_img_binary: /usr/bin/qemu-img
+  #qemu_img_binary: # When used, ITCHY will use this binary to run qemu-img command (converting images)
 
 ###############################################
 #######  DO NOT EDIT AFTER THIS POINT  ########

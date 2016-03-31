@@ -46,7 +46,7 @@ module Itchy
           new_file_name = copy_same_format(unpacking_dir, metadata)
         else
           converter = Itchy::FormatConverter.new(unpacking_dir, metadata, vmcatcher_configuration)
-          new_file_name = converter.convert!(file_format, @options.required_format, @options.output_dir)
+          new_file_name = converter.convert!(file_format, @options.required_format, @options.output_dir, @options.qemu_img_binary)
         end
         remove_dir(unpacking_dir)
       rescue Itchy::Errors::FileInspectError, Itchy::Errors::FormatConversionError,
@@ -64,7 +64,10 @@ module Itchy
     # @param unpacking_dir [String] name and path of the checked file
     # @return [String] image format
     def format(file)
-      image_format_tester = Mixlib::ShellOut.new("qemu-img info #{file}")
+
+      qemu_command = @options.qemu_img_binary || Itchy::BASIC_QEMU_COMMAND
+
+      image_format_tester = Mixlib::ShellOut.new("#{qemu_command} info #{file}")
       image_format_tester.run_command
       begin
         image_format_tester.error!
@@ -119,7 +122,7 @@ module Itchy
       dir = Dir.new directory
       counter = 0
       files = dir['*']
-      files each do |file|
+      files.each do |file|
         file_format = format("#{directory}/#{file}")
         if KNOWN_IMAGE_FORMATS.include? file_format
           counter += 1
@@ -202,7 +205,7 @@ module Itchy
     # @param vmcatcher_configuration [Itchy::VmcatcherConfiguration] current VMC configuration
     # @return [String] path to the newly created image directory
     def prepare_image_temp_dir(metadata, vmcatcher_configuration)
-      temp_dir = "#{vmcatcher_configuration.cache_dir_cache}/temp/#{metadata.dc_identifier}"
+      temp_dir = "#{@options.temp_image_dir}/#{metadata.dc_identifier}"
 
       begin
         ::FileUtils.mkdir_p temp_dir
