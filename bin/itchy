@@ -131,7 +131,7 @@ class ItchyRunnable < Thor
   method_option :qemu_img_binary,
                 type: :string,
                 default: Itchy::Settings['qemu_img_binary'],
-                aliases: '-q'
+                aliases: '-q',
                 desc: 'Path to qemu-img command binary, if not used, ITCHY will look for it in PATH'
 
   method_option *shared_option_log_level
