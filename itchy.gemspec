@@ -29,6 +29,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'hashie', '~> 3.3', '>= 3.3.1'
   gem.add_dependency 'thor', '~> 0.19', '>= 0.19.1'
   gem.add_dependency 'cloud-appliance-descriptor', '~> 0.2'
+  gem.add_dependency 'nokogiri', '~>1.6', '>= 1.6.7'
 
   gem.add_development_dependency 'bundler', '~> 1.6'
   gem.add_development_dependency 'rake', '~> 10.0'

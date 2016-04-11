@@ -1,4 +1,6 @@
 require 'active_support/all'
+require 'rubygems'
+require 'nokogiri'
 require 'settingslogic'
 require 'multi_json'
 require 'mixlib/shellout'
@@ -7,11 +9,16 @@ require 'uri'
 require 'erb'
 require 'hashie/mash'
 require 'cloud-appliance-descriptor'
+require 'rubygems/package'
 
 # Wraps all internals of the handler.
 module Itchy
   BASIC_QEMU_COMMAND = 'qemu-img'
+  GEM_DIR = File.realdirpath(File.join(File.dirname(__FILE__), '..'))
+  XSD_SCHEMA = File.join(GEM_DIR, 'resources', 'dsp8023_2.0.1.xsd')  
+  XSD_DIR = File.join(GEM_DIR, 'resources')
 end
+
 
 require 'itchy/version'
 require 'itchy/settings'
