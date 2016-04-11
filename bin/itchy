@@ -33,12 +33,17 @@ class ItchyRunnable < Thor
   AVAILABLE_AUTH_METHODS = %w(none basic).freeze
   ERROR_EXIT_CODE = 1
 
-  shared_option_log_level = [:log_level, { enum: AVAILABLE_LOG_LEVELS,
-                                           default: Itchy::Settings.log_level,
-                                           aliases: '-b', desc: 'Logging level' }]
+  class_option  :log_level,
+                enum: AVAILABLE_LOG_LEVELS,
+                default: Itchy::Settings.log_level,
+                aliases: '-b',
+                desc: 'Logging level'
 
-  shared_option_debug = [:debug, { type: :boolean, default: Itchy::Settings.debug,
-                                   aliases: '-d', desc: 'Enable debugging' }]
+  class_option  :debug,
+                type: :boolean,
+                default: Itchy::Settings.debug,
+                aliases: '-d',
+                desc: 'Enable debugging'
 
   # Static method required by Thor to make certain
   # actions work.
@@ -58,7 +63,7 @@ class ItchyRunnable < Thor
                 type: :string,
                 default: Itchy::Settings.log_to.archive_log,
                 aliasses: '-l',
-                desc: 'Logging output, file path or stderr/stdout'
+                desc: 'Logging output for archive command, file path or stderr/stdout'
   
   method_option :file_permissions,
                 type: :string,
@@ -66,9 +71,6 @@ class ItchyRunnable < Thor
                 aliases: '-p',
                 desc: 'Sets permissions for all created files'
   
-  method_option *shared_option_log_level
-  method_option *shared_option_debug
-
   def archive
     check_restrictions
     opts = normalize_options
@@ -125,7 +127,7 @@ class ItchyRunnable < Thor
                 type: :string,
                 default: Itchy::Settings.log_to.process_log,
                 aliases: '-l',
-                desc: 'Logging output, file path or stderr/stdout'
+                desc: 'Logging output for process command, file path or stderr/stdout'
   
   
   method_option :qemu_img_binary,
@@ -133,9 +135,6 @@ class ItchyRunnable < Thor
                 default: Itchy::Settings['qemu_img_binary'],
                 aliases: '-q',
                 desc: 'Path to qemu-img command binary, if not used, ITCHY will look for it in PATH'
-
-  method_option *shared_option_log_level
-  method_option *shared_option_debug
 
   def process
     check_restrictions
