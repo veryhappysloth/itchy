@@ -7,6 +7,7 @@ require 'uri'
 require 'erb'
 require 'hashie/mash'
 require 'cloud-appliance-descriptor'
+require 'rubygems/package'
 
 # Wraps all internals of the handler.
 module Itchy
