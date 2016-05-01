@@ -76,9 +76,15 @@ ITCHY starts with executable `itchy`. For further assistance run `itchy help`:
 $ itchy help
 
 Commands:
-itchy archive         # Handle an incoming vmcatcher event and store it for...
-itchy help [COMMAND]  # Describe available commands or one specific command
-itchy process         # Process stored events
+  itchy archive         # Handle an incoming vmcatcher event and store it for further processing
+  itchy help [COMMAND]  # Describe available commands or one specific command
+  itchy process         # Process stored events
+
+Options:
+  -b, [--log-level=LOG_LEVEL]  # Logging level
+                               # Default: error
+                               # Possible values: debug, info, warn, error, fatal, unknown
+  -d, [--debug], [--no-debug]  # Enable debugging
 ```
 ### ARCHIVE
 This command is used as an event handler for `vmcatcher`.
@@ -86,22 +92,6 @@ For proper running it needs to have set required env variables by `vmcatcher`.
 ```bash
 $ itchy help archive
 
-Usage:
-  itchy archive
-
-  Options:
-    -m, [--metadata-dir=METADATA_DIR]          # Path to a metadata directory for storing events, must be writable
-                                               # Default: /var/spool/itchy/metadata
-        [--log-to=LOG_TO]                      # Logging output, file path or stderr/stdout
-                                               # Default: /var/log/itchy/archive.log
-    -p, [--file-permissions=FILE_PERMISSIONS]  # Sets permissions for all created files
-                                               # Default: 0664
-    -b, [--log-level=LOG_LEVEL]                # Logging level
-                                               # Default: error
-                                               # Possible values: debug, info, warn, error, fatal, unknown
-    -d, [--debug], [--no-debug]                # Enable debugging
-
-Handle an incoming vmcatcher event and store it for further processing
 ```
 ### PROCESS
 

@@ -34,12 +34,20 @@ module Itchy
     def transform!(metadata, vmcatcher_configuration)
       Itchy::Log.info "[#{self.class.name}] Transforming image format " \
                              "for #{metadata.dc_identifier.inspect}"
+
+      image_file = orig_image_file(metadata, vmcatcher_configuration)
+
+      unless File.file?(image_file)
+        Itchy::Log.error "[#{self.class.name}] Event image file - #{image_file}] - does not exist!"
+        fail Itchy::Errors::ImageTransformationError
+      end
+
       begin
-        if archived?(metadata.dc_identifier.inspect)
+        if archived?(image_file)
           unpacking_dir = unpack_archived!(metadata, vmcatcher_configuration)
           file_format = inspect_unpacked_dir(unpacking_dir, metadata)
         else
-          file_format = format(orig_image_file(metadata, vmcatcher_configuration))
+          file_format = format(image_file)
           unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
         end
         if file_format == @options.required_format

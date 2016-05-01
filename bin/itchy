@@ -62,7 +62,7 @@ class ItchyRunnable < Thor
   method_option :log_to,
                 type: :string,
                 default: Itchy::Settings.log_to.archive_log,
-                aliasses: '-l',
+                aliases: '-l',
                 desc: 'Logging output for archive command, file path or stderr/stdout'
   
   method_option :file_permissions,
