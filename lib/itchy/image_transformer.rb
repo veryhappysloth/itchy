@@ -44,8 +44,8 @@ module Itchy
 
       begin
         if archived?(image_file)
-          unpacking_dir = unpack_archived!(metadata, vmcatcher_configuration)
-          file_format = inspect_unpacked_dir(unpacking_dir, metadata)
+          unpacking_dir = process_archived(metadata, vmcatcher_configuration)
+          file_format = format("#{unpacking_dir}/#{metadata.dc_identifier}")
         else
           file_format = format(image_file)
           unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
@@ -92,6 +92,37 @@ module Itchy
       end
       file_format
     end
+
+
+    def process_archive(metadata, vmcatcher_configuration)
+      unpacking_dir = nil
+      File.open(orig_image_file(metadata, vmcatcher_configuration), "rb") do |file|
+        Gem::Package::TarReader.new(file) do |archive|
+          disk_name = nil
+          archive.each do |entry|
+              disk_name = process_ovf(entry.full_name) if File.extname(entry).eql? ".ovf"
+          end
+          disk = archive.seek(disk_name)
+          unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration)
+          File.open("#{unpacking_dir}/#{metadata.dc_identifier}", "wb") do |f|
+            f.write(disk.read)
+          end
+        end
+      end
+      
+      unpacking_dir
+    end
+
+    def process_ovf(ovf_file)
+      doc = Nokogiri::XML(File.open(ovf_file))
+      if doc.css("Envelope DiskSection Disk").count != 1
+        Itchy::Log.error "[#{self.class.name}] Unsupported ova, contains 0 or more than one disk!"
+        fail Itchy::Errors::FileInspectError
+      end
+      # return the name of disk
+      doc.css("Envelope References File").attr("href").value
+    end
+
 
     #
     #

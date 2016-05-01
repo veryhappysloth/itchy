@@ -1,4 +1,6 @@
 require 'active_support/all'
+require 'rubygems'
+require 'nokogiri'
 require 'settingslogic'
 require 'multi_json'
 require 'mixlib/shellout'
