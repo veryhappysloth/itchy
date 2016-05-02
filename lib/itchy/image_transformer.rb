@@ -95,15 +95,19 @@ module Itchy
 
 
     def process_archive(metadata, vmcatcher_configuration)
-      unpacking_dir = nil
+      unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration)
       File.open(orig_image_file(metadata, vmcatcher_configuration), "rb") do |file|
         Gem::Package::TarReader.new(file) do |archive|
           disk_name = nil
           archive.each do |entry|
-              (disk_name = process_ovf(entry.full_name)) if File.extname(entry).eql? ".ovf"
+            if File.extname(entry).eql? ".ovf" then
+              File.open("#{unpacking_dir}/#{entry.full_name}", "wb") do |f|
+                f.write(entry.read)
+              end
+              disk_name = process_ovf("#{unpacking_dir}/#{entry.full_name}")
+            end
           end
           disk = archive.seek(disk_name)
-          unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration)
           File.open("#{unpacking_dir}/#{metadata.dc_identifier}", "wb") do |f|
             f.write(disk.read)
           end
@@ -262,6 +266,7 @@ module Itchy
                                 "#{ex.message}"
         fail Itchy::Errors::PrepareEnvError, ex
       end
+      temp_dir[0]
     end
 
     # Checks if file is archived image (format ova or tar)
