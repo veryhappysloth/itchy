@@ -44,7 +44,7 @@ module Itchy
 
       begin
         if archived?(image_file)
-          unpacking_dir = process_archived(metadata, vmcatcher_configuration)
+          unpacking_dir = process_archive(metadata, vmcatcher_configuration)
           file_format = format("#{unpacking_dir}/#{metadata.dc_identifier}")
         else
           file_format = format(image_file)
@@ -100,7 +100,7 @@ module Itchy
         Gem::Package::TarReader.new(file) do |archive|
           disk_name = nil
           archive.each do |entry|
-              disk_name = process_ovf(entry.full_name) if File.extname(entry).eql? ".ovf"
+              (disk_name = process_ovf(entry.full_name)) if File.extname(entry).eql? ".ovf"
           end
           disk = archive.seek(disk_name)
           unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration)
@@ -115,6 +115,7 @@ module Itchy
 
     def process_ovf(ovf_file)
       doc = Nokogiri::XML(File.open(ovf_file))
+      validate_ovf(doc, schema)
       if doc.css("Envelope DiskSection Disk").count != 1
         Itchy::Log.error "[#{self.class.name}] Unsupported ova, contains 0 or more than one disk!"
         fail Itchy::Errors::FileInspectError
@@ -123,6 +124,13 @@ module Itchy
       doc.css("Envelope References File").attr("href").value
     end
 
+    def validate_ovf(doc)
+      xsd = Nokogiri::XML::Schema(File.read(XSD_SCHEMA))
+      unless xsd.valid?(doc) then
+        Itchy::Log.error "[#{self.class.name}] OVF validation failed!"
+        fail Itchy::Errors::FileInspectError
+      end
+    end
 
     #
     #

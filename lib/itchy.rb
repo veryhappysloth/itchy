@@ -14,7 +14,10 @@ require 'rubygems/package'
 # Wraps all internals of the handler.
 module Itchy
   BASIC_QEMU_COMMAND = 'qemu-img'
+  GEM_DIR = File.realdirpath(File.join(File.dirname(__FILE__), '..'))
+  XSD_SCHEMA = File.join(GEM_DIR, 'resources', 'dsp8023_2.0.1.xsd')  
 end
+
 
 require 'itchy/version'
 require 'itchy/settings'
