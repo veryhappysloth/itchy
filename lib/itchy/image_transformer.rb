@@ -130,10 +130,12 @@ module Itchy
     end
 
     def validate_ovf(doc)
-      xsd = Nokogiri::XML::Schema(File.read(XSD_SCHEMA))
-      unless xsd.valid?(doc) then
-        Itchy::Log.error "[#{self.class.name}] OVF validation failed!"
-        fail Itchy::Errors::FileInspectError
+      Dir.chdir(XSD_DIR) do
+        xsd = Nokogiri::XML::Schema(File.read(XSD_SCHEMA))
+        unless xsd.valid?(doc) then
+          Itchy::Log.error "[#{self.class.name}] OVF validation failed!"
+          fail Itchy::Errors::FileInspectError
+        end
       end
     end
 

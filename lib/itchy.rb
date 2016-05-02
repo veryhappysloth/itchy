@@ -16,6 +16,7 @@ module Itchy
   BASIC_QEMU_COMMAND = 'qemu-img'
   GEM_DIR = File.realdirpath(File.join(File.dirname(__FILE__), '..'))
   XSD_SCHEMA = File.join(GEM_DIR, 'resources', 'dsp8023_2.0.1.xsd')  
+  XSD_DIR = File.join(GEM_DIR, 'resources')
 end
 
 
