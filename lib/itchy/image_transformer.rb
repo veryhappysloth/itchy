@@ -100,17 +100,31 @@ module Itchy
         Gem::Package::TarReader.new(file) do |archive|
           disk_name = nil
           archive.each do |entry|
+            Itchy::Log.debug "EACH NAME: #{entry.full_name}"
             if File.extname(entry.full_name).eql? ".ovf" then
               File.open("#{unpacking_dir}/#{entry.full_name}", "wb") do |f|
                 f.write(entry.read)
               end
               disk_name = process_ovf("#{unpacking_dir}/#{entry.full_name}")
+              Itchy::Log.debug "FOUND DISK NAME FROM OVF: #{disk_name}"
+              break        
             end
           end
+          begin
+	  archive.rewind()
           archive.seek(disk_name) do |disk|
+            Itchy::Log.debug "Seeked disk - with name: #{disk.full_name}"
             File.open("#{unpacking_dir}/#{metadata.dc_identifier}", "wb") do |f|
-              f.write(disk.read)
+              until disk.eof?
+		output = disk.read(50000000)
+		f.write(output)
+              end
             end
+          end
+          rescue => e
+            Ichy::Log.error e.message
+            Itchy::Log.error e.backtrace.join("\n")
+            fail e
           end
         end
       end
@@ -119,8 +133,9 @@ module Itchy
     end
 
     def process_ovf(ovf_file)
+Itchy::Log.debug "PROCESSING OVF FILE: #{ovf_file}"
       doc = Nokogiri::XML(File.open(ovf_file))
-      validate_ovf(doc)
+      #validate_ovf(doc)
       if doc.css("Envelope DiskSection Disk").count != 1
         Itchy::Log.error "[#{self.class.name}] Unsupported ova, contains 0 or more than one disk!"
         fail Itchy::Errors::FileInspectError
@@ -130,8 +145,12 @@ module Itchy
     end
 
     def validate_ovf(doc)
+Itchy::Log.debug "VALIDATING from DIR: #{XSD_DIR} with schema #{XSD_SCHEMA}"
       Dir.chdir(XSD_DIR) do
         xsd = Nokogiri::XML::Schema(File.read(XSD_SCHEMA))
+        xsd.validate(doc).each do |error|
+          Itchy::Log.error "VALIDATION ERROR: #{error.message}"
+        end
         unless xsd.valid?(doc) then
           Itchy::Log.error "[#{self.class.name}] OVF validation failed!"
           fail Itchy::Errors::FileInspectError
@@ -269,7 +288,7 @@ module Itchy
                                 "#{ex.message}"
         fail Itchy::Errors::PrepareEnvError, ex
       end
-      temp_dir[0]
+      temp_dir
     end
 
     # Checks if file is archived image (format ova or tar)
