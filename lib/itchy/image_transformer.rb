@@ -100,16 +100,17 @@ module Itchy
         Gem::Package::TarReader.new(file) do |archive|
           disk_name = nil
           archive.each do |entry|
-            if File.extname(entry).eql? ".ovf" then
+            if File.extname(entry.full_name).eql? ".ovf" then
               File.open("#{unpacking_dir}/#{entry.full_name}", "wb") do |f|
                 f.write(entry.read)
               end
               disk_name = process_ovf("#{unpacking_dir}/#{entry.full_name}")
             end
           end
-          disk = archive.seek(disk_name)
-          File.open("#{unpacking_dir}/#{metadata.dc_identifier}", "wb") do |f|
-            f.write(disk.read)
+          archive.seek(disk_name) do |disk|
+            File.open("#{unpacking_dir}/#{metadata.dc_identifier}", "wb") do |f|
+              f.write(disk.read)
+            end
           end
         end
       end
@@ -119,7 +120,7 @@ module Itchy
 
     def process_ovf(ovf_file)
       doc = Nokogiri::XML(File.open(ovf_file))
-      validate_ovf(doc, schema)
+      validate_ovf(doc)
       if doc.css("Envelope DiskSection Disk").count != 1
         Itchy::Log.error "[#{self.class.name}] Unsupported ova, contains 0 or more than one disk!"
         fail Itchy::Errors::FileInspectError
