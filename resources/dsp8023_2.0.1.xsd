@@ -82,17 +82,17 @@
 		changed initialBootStopDelay to use="required" to align with DSP0243
 -->
 <xs:schema xmlns:ovf="http://schemas.dmtf.org/ovf/envelope/2" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cim="http://schemas.dmtf.org/wbem/wscim/1/common" xmlns:vssd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemSettingData" xmlns:rasd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData" xmlns:epasd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_EthernetPortAllocationSettingData" xmlns:sasd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_StorageAllocationSettingData" xmlns:bootc="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_BootConfigSetting" xmlns:boots="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_BootSourceSetting" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:xenc11="http://www.w3.org/2009/xmlenc11#" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" targetNamespace="http://schemas.dmtf.org/ovf/envelope/2" elementFormDefault="qualified" attributeFormDefault="qualified">
-	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
-	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/common" schemaLocation="http://schemas.dmtf.org/wbem/wscim/1/common.xsd"/>
-	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemSettingData" schemaLocation="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemSettingData.xsd"/>
-	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData" schemaLocation="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData.xsd"/>
-	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_StorageAllocationSettingData" schemaLocation="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_StorageAllocationSettingData.xsd"/>
-	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_EthernetPortAllocationSettingData" schemaLocation="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_EthernetPortAllocationSettingData.xsd"/>
-	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_BootConfigSetting" schemaLocation="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_BootConfigSetting.xsd"/>
-	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_BootSourceSetting" schemaLocation="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_BootSourceSetting.xsd"/>
-	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd"/>
-	<xs:import namespace="http://www.w3.org/2001/04/xmlenc#" schemaLocation="http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/xenc-schema.xsd"/>
-	<xs:import namespace="http://www.w3.org/2009/xmlenc11#" schemaLocation="http://www.w3.org/TR/2012/WD-xmlenc-core1-20120105/xenc-schema-11.xsd"/>
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/common" schemaLocation="common.xsd"/>
+	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemSettingData" schemaLocation="CIM_VirtualSystemSettingData.xsd"/>
+	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData" schemaLocation="CIM_ResourceAllocationSettingData.xsd"/>
+	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_StorageAllocationSettingData" schemaLocation="CIM_StorageAllocationSettingData.xsd"/>
+	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_EthernetPortAllocationSettingData" schemaLocation="CIM_EthernetPortAllocationSettingData.xsd"/>
+	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_BootConfigSetting" schemaLocation="CIM_BootConfigSetting.xsd"/>
+	<xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_BootSourceSetting" schemaLocation="CIM_BootSourceSetting.xsd"/>
+	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xs:import namespace="http://www.w3.org/2001/04/xmlenc#" schemaLocation="xenc-schema.xsd"/>
+	<xs:import namespace="http://www.w3.org/2009/xmlenc11#" schemaLocation="xenc-schema-11.xsd"/>
 	<!-- Global attributes -->
 	<xs:attribute name="required" type="xs:boolean" default="true">
 		<xs:annotation>
