@@ -8,6 +8,9 @@ module Itchy
     # Archive format string msg
     ARCHIVE_STRING = 'POSIX tar archive'
 
+    # raw boot sector message
+    REAL_RAW_STRING = 'boot sector'
+
     # REGEX pattern for getting image format
     FORMAT_PATTERN = /format:\s(.*?)$/
 
@@ -90,9 +93,20 @@ module Itchy
         Itchy::Log.error "Image format #{file_format} is unknown and not supported!"
         fail Itchy::Errors::FileInspectError
       end
+Itchy::Log.debug "#{file_format}"
+      if file_format.eql? "raw" then
+        unless check_real_raw(file)
+	  Itchy::Log.error "Image format is not a real RAW, it has no boot sector!"
+          fail Itchy::Errors::FileInspectError
+        end
+      end
+      
       file_format
     end
 
+    def check_real_raw(file)
+      file_command(file).include? REAL_RAW_STRING
+    end 
 
     def process_archive(metadata, vmcatcher_configuration)
       unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration)
@@ -291,12 +305,8 @@ Itchy::Log.debug "VALIDATING from DIR: #{XSD_DIR} with schema #{XSD_SCHEMA}"
       temp_dir
     end
 
-    # Checks if file is archived image (format ova or tar)
-    #
-    # @param file [String] inspected file name
-    # @return [Boolean] archived or not
-    def archived?(file)
-      image_format_tester = Mixlib::ShellOut.new("file #{file}")
+    def file_command(file)
+      image_format_tester = Mixlib::ShellOut.new("file --brief #{file}")
       image_format_tester.run_command
       begin
         image_format_tester.error!
@@ -305,9 +315,17 @@ Itchy::Log.debug "VALIDATING from DIR: #{XSD_DIR} with schema #{XSD_SCHEMA}"
         Itchy::Log.error "[#{self.class.name}] Checking file format for" \
           "#{file} failed with #{image_format_tester.stderr}"
         fail Itchy::Errors::FileInspectError, ex
-                                
       end
-      temp = image_format_tester.stdout
+      image_format_tester.stdout
+    end
+
+
+    # Checks if file is archived image (format ova or tar)
+    #
+    # @param file [String] inspected file name
+    # @return [Boolean] archived or not
+    def archived?(file)
+      temp = file_command(file)
       temp.include? ARCHIVE_STRING
     end
   end
