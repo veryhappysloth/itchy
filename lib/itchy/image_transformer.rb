@@ -93,7 +93,6 @@ module Itchy
         Itchy::Log.error "Image format #{file_format} is unknown and not supported!"
         fail Itchy::Errors::FileInspectError
       end
-Itchy::Log.debug "#{file_format}"
       if file_format.eql? "raw" then
         unless check_real_raw(file)
 	  Itchy::Log.error "Image format is not a real RAW, it has no boot sector!"
@@ -147,7 +146,7 @@ Itchy::Log.debug "#{file_format}"
     end
 
     def process_ovf(ovf_file)
-Itchy::Log.debug "PROCESSING OVF FILE: #{ovf_file}"
+      Itchy::Log.debug "PROCESSING OVF FILE: #{ovf_file}"
       doc = Nokogiri::XML(File.open(ovf_file))
       #validate_ovf(doc)
       if doc.css("Envelope DiskSection Disk").count != 1
@@ -158,8 +157,9 @@ Itchy::Log.debug "PROCESSING OVF FILE: #{ovf_file}"
       doc.css("Envelope References File").attr("href").value
     end
 
+    # Validation is not used for now
     def validate_ovf(doc)
-Itchy::Log.debug "VALIDATING from DIR: #{XSD_DIR} with schema #{XSD_SCHEMA}"
+      Itchy::Log.debug "VALIDATING from DIR: #{XSD_DIR} with schema #{XSD_SCHEMA}"
       Dir.chdir(XSD_DIR) do
         xsd = Nokogiri::XML::Schema(File.read(XSD_SCHEMA))
         xsd.validate(doc).each do |error|
