@@ -8,6 +8,9 @@ module Itchy
     # Archive format string msg
     ARCHIVE_STRING = 'POSIX tar archive'
 
+    # raw boot sector message
+    REAL_RAW_STRING = 'boot sector'
+
     # REGEX pattern for getting image format
     FORMAT_PATTERN = /format:\s(.*?)$/
 
@@ -34,12 +37,20 @@ module Itchy
     def transform!(metadata, vmcatcher_configuration)
       Itchy::Log.info "[#{self.class.name}] Transforming image format " \
                              "for #{metadata.dc_identifier.inspect}"
+
+      image_file = orig_image_file(metadata, vmcatcher_configuration)
+
+      unless File.file?(image_file)
+        Itchy::Log.error "[#{self.class.name}] Event image file - #{image_file}] - does not exist!"
+        fail Itchy::Errors::ImageTransformationError
+      end
+
       begin
-        if archived?(metadata.dc_identifier.inspect)
-          unpacking_dir = unpack_archived!(metadata, vmcatcher_configuration)
-          file_format = inspect_unpacked_dir(unpacking_dir, metadata)
+        if archived?(image_file)
+          unpacking_dir = process_archive(metadata, vmcatcher_configuration)
+          file_format = format("#{unpacking_dir}/#{metadata.dc_identifier}")
         else
-          file_format = format(orig_image_file(metadata, vmcatcher_configuration))
+          file_format = format(image_file)
           unpacking_dir = copy_unpacked!(metadata, vmcatcher_configuration)
         end
         if file_format == @options.required_format
@@ -82,7 +93,83 @@ module Itchy
         Itchy::Log.error "Image format #{file_format} is unknown and not supported!"
         fail Itchy::Errors::FileInspectError
       end
+      if file_format.eql? "raw" then
+        unless check_real_raw(file)
+	  Itchy::Log.error "Image format is not a real RAW, it has no boot sector!"
+          fail Itchy::Errors::FileInspectError
+        end
+      end
+      
       file_format
+    end
+
+    def check_real_raw(file)
+      file_command(file).include? REAL_RAW_STRING
+    end 
+
+    def process_archive(metadata, vmcatcher_configuration)
+      unpacking_dir = prepare_image_temp_dir(metadata, vmcatcher_configuration)
+      File.open(orig_image_file(metadata, vmcatcher_configuration), "rb") do |file|
+        Gem::Package::TarReader.new(file) do |archive|
+          disk_name = nil
+          archive.each do |entry|
+            Itchy::Log.debug "EACH NAME: #{entry.full_name}"
+            if File.extname(entry.full_name).eql? ".ovf" then
+              File.open("#{unpacking_dir}/#{entry.full_name}", "wb") do |f|
+                f.write(entry.read)
+              end
+              disk_name = process_ovf("#{unpacking_dir}/#{entry.full_name}")
+              Itchy::Log.debug "FOUND DISK NAME FROM OVF: #{disk_name}"
+              break        
+            end
+          end
+          begin
+	  archive.rewind()
+          archive.seek(disk_name) do |disk|
+            Itchy::Log.debug "Seeked disk - with name: #{disk.full_name}"
+            File.open("#{unpacking_dir}/#{metadata.dc_identifier}", "wb") do |f|
+              until disk.eof?
+		output = disk.read(50000000)
+		f.write(output)
+              end
+            end
+          end
+          rescue => e
+            Ichy::Log.error e.message
+            Itchy::Log.error e.backtrace.join("\n")
+            fail e
+          end
+        end
+      end
+      
+      unpacking_dir
+    end
+
+    def process_ovf(ovf_file)
+      Itchy::Log.debug "PROCESSING OVF FILE: #{ovf_file}"
+      doc = Nokogiri::XML(File.open(ovf_file))
+      #validate_ovf(doc)
+      if doc.css("Envelope DiskSection Disk").count != 1
+        Itchy::Log.error "[#{self.class.name}] Unsupported ova, contains 0 or more than one disk!"
+        fail Itchy::Errors::FileInspectError
+      end
+      # return the name of disk
+      doc.css("Envelope References File").attr("href").value
+    end
+
+    # Validation is not used for now
+    def validate_ovf(doc)
+      Itchy::Log.debug "VALIDATING from DIR: #{XSD_DIR} with schema #{XSD_SCHEMA}"
+      Dir.chdir(XSD_DIR) do
+        xsd = Nokogiri::XML::Schema(File.read(XSD_SCHEMA))
+        xsd.validate(doc).each do |error|
+          Itchy::Log.error "VALIDATION ERROR: #{error.message}"
+        end
+        unless xsd.valid?(doc) then
+          Itchy::Log.error "[#{self.class.name}] OVF validation failed!"
+          fail Itchy::Errors::FileInspectError
+        end
+      end
     end
 
     #
@@ -215,14 +302,11 @@ module Itchy
                                 "#{ex.message}"
         fail Itchy::Errors::PrepareEnvError, ex
       end
+      temp_dir
     end
 
-    # Checks if file is archived image (format ova or tar)
-    #
-    # @param file [String] inspected file name
-    # @return [Boolean] archived or not
-    def archived?(file)
-      image_format_tester = Mixlib::ShellOut.new("file #{file}")
+    def file_command(file)
+      image_format_tester = Mixlib::ShellOut.new("file --brief #{file}")
       image_format_tester.run_command
       begin
         image_format_tester.error!
@@ -231,9 +315,17 @@ module Itchy
         Itchy::Log.error "[#{self.class.name}] Checking file format for" \
           "#{file} failed with #{image_format_tester.stderr}"
         fail Itchy::Errors::FileInspectError, ex
-                                
       end
-      temp = image_format_tester.stdout
+      image_format_tester.stdout
+    end
+
+
+    # Checks if file is archived image (format ova or tar)
+    #
+    # @param file [String] inspected file name
+    # @return [Boolean] archived or not
+    def archived?(file)
+      temp = file_command(file)
       temp.include? ARCHIVE_STRING
     end
   end
